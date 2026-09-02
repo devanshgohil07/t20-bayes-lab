@@ -147,19 +147,25 @@ def f4():
         x = z[f"M3_{k}"]
         for c in range(x.shape[0]):
             axes[r, 0].plot(x[c], lw=.5, alpha=.75, color=LCOL[c])
-        axes[r, 0].set_ylabel(lab, fontsize=9)
+        axes[r, 0].set_ylabel(lab.split("  ")[0], fontsize=11)
+        axes[r, 0].text(.015, .95, lab.split("  ")[1].strip("()"),
+                        transform=axes[r, 0].transAxes, ha="left", va="top",
+                        fontsize=8, color=MUTED,
+                        bbox=dict(fc="white", ec="none", alpha=.75, pad=1.5))
         axes[r, 1].hist(x.reshape(-1), bins=45, orientation="horizontal",
                         color=MUTED, alpha=.6)
         axes[r, 1].set_ylim(axes[r, 0].get_ylim()); axes[r, 1].set_xticks([]); axes[r, 1].set_yticks([])
-        axes[r, 0].text(.985, .93, f"$\\hat R$ = {dg.split_rhat(x):.4f}   ESS = {dg.ess(x):.0f}",
-                        transform=axes[r, 0].transAxes, ha="right", fontsize=8, color=MUTED)
+        axes[r, 0].text(.985, .95, f"$\\hat R$ = {dg.split_rhat(x):.4f}   ESS = {dg.ess(x):.0f}",
+                        transform=axes[r, 0].transAxes, ha="right", va="top",
+                        fontsize=8, color=MUTED,
+                        bbox=dict(fc="white", ec="none", alpha=.75, pad=1.5))
         if r < 3:
             axes[r, 0].set_xticklabels([])
     axes[3, 0].set_xlabel("draw (after 4,000 burn-in, thinned by 4)")
     fig.tight_layout()
     figtitle(fig, "F4 · Trace plots for the four global parameters (M3)",
              "Each colour is one chain; the panel on the right is the pooled posterior.",
-             top=0.93)
+             top=0.90)
     save(fig, "F4_traces", FIGS)
 
 # ============================================================== F5  ACF ====
@@ -191,7 +197,8 @@ def f6():
     ax.axhline(0, color=INK, lw=.8, ls=":")
     ax.set_ylim(-60, 280)
     ax.text(.98, .04, "grey = 60 replicated datasets\nred = the real one", transform=ax.transAxes,
-            ha="right", fontsize=8.5, color=MUTED)
+            ha="right", fontsize=8.5, color=MUTED,
+            bbox=dict(fc="white", ec="none", alpha=.8, pad=2))
     ax = axes[1]
     reps = np.array([np.std(r[n < 100]) for r in yrep])
     ax.hist(reps, bins=35, color=MUTED, alpha=.6)
@@ -199,7 +206,8 @@ def f6():
     ax.set_xlabel("SD of strike rate among cells under 100 balls")
     ax.set_yticks([])
     ax.text(.03, .93, "the model expects short spells to be\nnoisier than they are",
-            transform=ax.transAxes, fontsize=8.5, color=MUTED, va="top")
+            transform=ax.transAxes, fontsize=8.5, color=MUTED, va="top",
+            bbox=dict(fc="white", ec="none", alpha=.8, pad=2))
     fig.tight_layout()
     figtitle(fig, "F6 · Posterior predictive check",
              "Left: data the fitted model would generate, against the data observed. "
@@ -354,8 +362,8 @@ def f10(threshold=140.0, k=18):
         ax.text(ax.get_xlim()[1], i, f"  {prob[gi]:.2f}", va="center", fontsize=8, color=MUTED)
     ax.set_yticks(ypos); ax.set_yticklabels(names, fontsize=8.5)
     ax.set_xlabel("strike rate on the IPL scale")
-    ax.legend(fontsize=8.5, loc="lower left", framealpha=.9, facecolor=PAPER,
-              edgecolor="none")
+    ax.legend(fontsize=8.5, loc="lower right", framealpha=1.0, facecolor=PAPER,
+              edgecolor="none", borderpad=.6)
     title(ax, "F10 · The shortlist, with credible intervals",
           f"Top {k} by $P(\\theta_i > {threshold:.0f} \\mid$ data$)$, shown at right. Bars are 95% credible intervals.")
     save(fig, "F10_shortlist", FIGS)

@@ -1,0 +1,10 @@
+\begin{tabular}{llp{8.2cm}}
+\toprule
+Parameter & Prior & Where the number comes from \\
+\midrule
+$\mu$ & $N(130, 20^2)$ & T20 batting averages a strike rate near 130; $\pm40$ covers anything sane. \\[2pt]
+$\tau^2$ & $\mathrm{IG}(3, 450)$ & Prior mean 225, i.e.\ $\tau\approx15$: most batters within $\pm30$ of the mean. \\[2pt]
+$\omega^2$ & $\mathrm{IG}(3, 128)$ & Prior mean 64, i.e.\ $\omega\approx8$: leagues differ by single-digit strike-rate points. \\[2pt]
+$\sigma^2$ & $\mathrm{IG}(3, 52,000)$ & Prior mean 26,000, from the ball-by-ball run distribution: $\mathrm{Var}(X)=2.80$ runs per ball $\Rightarrow \sigma^2\approx27,978$. \\[2pt]
+\bottomrule
+\end{tabular}

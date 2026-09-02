@@ -1,0 +1,16 @@
+# Cricsheet archives — download them yourself, they are not ours to redistribute
+raw/
+
+# Posterior draws: 144 MB, and regenerated in about fifteen seconds by
+#   python3 analysis/run_main.py
+out/*.npz
+
+__pycache__/
+*.pyc
+
+# LaTeX scratch
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.synctex.gz

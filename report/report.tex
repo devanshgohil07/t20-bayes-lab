@@ -10,9 +10,14 @@
 \begin{document}
 \maketitle
 \vspace{-2.2cm}
-\begin{center}\small\color{muted}
+\begin{center}
+{\normalsize\color{ink}
+Amartya Jayavel \quad Animesh Kushwaha \quad Ayush Yadav \quad Devansh Gohil\\[4pt]
+Nandini Giri \quad Prabhas Sanjay Sah \quad Sunidhi Shreya \quad Yashwardhan Jaggari}
+\\[9pt]
+{\small\color{muted}
 Group project · Bayesian Statistics\\
-Interactive companion: \url{https://devanshgohil07.github.io/t20-bayes-lab/}
+Interactive companion: \url{https://devanshgohil07.github.io/t20-bayes-lab/}}
 \end{center}
 \vspace{6pt}
 \hrule
@@ -20,7 +25,7 @@ Interactive companion: \url{https://devanshgohil07.github.io/t20-bayes-lab/}
 
 \begin{callout}
 \textbf{Summary.} A T20 strike rate is an average over a small number of balls, and such
-averages are noisy. Counting runs off the bat across \nNballs\ deliveries shows that a
+averages are noisy. Counting runs off the bat across \nNdeliveries\ deliveries shows that a
 100-ball strike rate carries \key{$\pm$\nsdHundred\ points} of sampling noise on its own,
 before any question about ability is raised. We fit a hierarchical Normal model to \nNcells\
 player $\times$ league cells from the IPL, CPL, BBL and men's T20 internationals, with one
@@ -47,7 +52,7 @@ a strike rate over that many balls by about $\pm$\ntopFifteenNoise\ points.
 \subsection{How much noise is in a strike rate?}
 
 Before any model, count. A ball off the bat produces 0, 1, 2, 3, 4, 5 or 6 runs, and in
-practice almost only 0, 1, 2, 4 and 6. Across the \nNballs\ deliveries in our window the mean
+practice almost only 0, 1, 2, 4 and 6. Across the \nNdeliveries\ deliveries in our window the mean
 is \nballMean\ runs per ball with variance \nballVar. A strike rate multiplies by 100, so the
 per-ball variance on the strike-rate scale is $\sigma^2 \approx \nsigmaSqBall$, and the
 standard deviation of an observed strike rate over $n$ balls is $\sigma/\sqrt{n}$. Putting
@@ -582,8 +587,10 @@ M3 has an RMSE of \nrmseMidMthree\ against \nrmseMidMone\ for the raw leaderboar
 
 \textbf{Batters with long IPL careers.} M1 \nrmseBigMone, M3 \nrmseBigMthree, M2
 \nrmseBigMtwo. These are within sampling error of one another, which is what the model
-predicts: at 300 balls and above, $w$ exceeds 0.8 and partial pooling has little left to add.
-We report this rather than claim an improvement that is not there.
+predicts. These batters have a median of \nbigMedianBalls\ balls across the four competitions,
+which puts the shrinkage weight $w$ at about \nbigMedianW: the estimate is already mostly their
+own record, so partial pooling has little left to add. We report this rather than claim an
+improvement that is not there.
 
 \textbf{Calibration.} The 95\% posterior predictive intervals cover \ncovMthree\% of the
 actual 2025 strike rates under M3, \ncovMtwo\% under M2 and \ncovMzero\% under M0. The
@@ -622,8 +629,9 @@ the right is $\Pr(\theta_i > 140 \mid \text{data})$.}
 
 At the baseline setting, \nshortAnalyst\ batters clear the threshold. The top of the list
 (\ntopTen) contains no surprises, which is a useful check: a method that produced an
-unrecognisable list would not be trusted. The differences appear further down. \nmoverName\ is
-eleventh on the raw list at 166.7 and has $\Pr(\theta > 140) = 0.05$. Batters with strong
+unrecognisable list would not be trusted. The differences appear further down. \nmoverName\ sits
+at rank \nmoverRankRaw\ on the raw list with a strike rate of \nmoverRawExact, and has
+$\Pr(\theta > 140) = \nmoverProb$. Batters with strong
 overseas records and no IPL history appear on the model's list and cannot appear on the raw one
 at all.
 
@@ -640,14 +648,17 @@ watched franchises overpay for one good season. ``Stress'' is not a plausible be
 deliberate extreme in which almost all apparent difference between T20 batters is noise.}
 \end{table}
 
-\textbf{The three plausible priors agree.} They give an identical top ten, shortlists of
-\nshortScout, \nshortAnalyst\ and \nshortCfo\ batters, and Jaccard overlap between 0.90 and
-0.93. This insensitivity indicates that the data are informative: with
-839 cells, and long careers for the batters who matter, the likelihood dominates the prior.
+\textbf{The three plausible priors agree.} All three return the same \ntopTenCommon\ names at
+the top of the list, in a slightly different order. Their shortlists hold \nshortScout,
+\nshortAnalyst\ and \nshortCfo\ batters, and any two of them overlap with a Jaccard index
+between \njaccardLo\ and \njaccardHi. This insensitivity indicates that the data are
+informative: with \nNcells\ cells, and long careers for the batters who matter, the likelihood
+dominates the prior.
 
 \textbf{The stress test shows where the conclusion would break.} Setting $\tau \approx 2.9$,
-which corresponds to the belief that T20 batters are nearly interchangeable, leaves 8 of the top
-10 names in place but reduces the shortlist from \nshortAnalyst\ batters to \nshortStress. The
+which corresponds to the belief that T20 batters are nearly interchangeable, leaves
+\nstressKeeps\ of the top ten names in place but reduces the shortlist from \nshortAnalyst\
+batters to \nshortStress. The
 \emph{ranking} is robust to the prior; a decision based on an \emph{absolute threshold} is
 not, because under that prior no batter can be shown to exceed 140. A franchise that wants a
 ranking need not worry much about the prior. A franchise that wants a yes or no answer at a
@@ -749,7 +760,7 @@ Folder & What is in it \\
 \end{center}
 
 The two files worth reading first are \texttt{analysis/gibbs.py}, which is the six full
-conditionals derived in Appendix~A written out in about a hundred lines, and
+conditionals derived in Appendix~A written out in under two hundred lines, and
 \texttt{app/js/gibbs.js}, which is the same sampler written a second time from the same
 derivations. Test 4 checks that the two agree.
 

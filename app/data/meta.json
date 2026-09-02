@@ -1,0 +1,301 @@
+{
+ "priors": {
+  "m0": 130.0,
+  "s0": 20.0,
+  "a_tau": 3.0,
+  "b_tau": 450.0,
+  "a_om": 3.0,
+  "b_om": 128.0,
+  "a_sig": 3.0,
+  "b_sig": 52000.0
+ },
+ "ballRuns": {
+  "values": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "counts": [
+   85355,
+   85099,
+   15483,
+   988,
+   25247,
+   23,
+   12806
+  ],
+  "mean": 1.3199,
+  "var": 2.7978,
+  "sigma2": 27978.0,
+  "sdAt100": 16.7
+ },
+ "fitted": {
+  "mu": 132.19,
+  "tau2": 131.0,
+  "sigma2": 53871.0,
+  "omega2": 53.9,
+  "sigmaEff": 232.1,
+  "sdAt100Fitted": 23.2,
+  "designEffect": 1.93,
+  "delta": [
+   0.0,
+   -7.9,
+   -4.97,
+   -5.25
+  ],
+  "deltaLo": [
+   0.0,
+   -11.68,
+   -8.49,
+   -8.16
+  ],
+  "deltaHi": [
+   0.0,
+   -4.03,
+   -1.49,
+   -2.41
+  ]
+ },
+ "overlap": [
+  [
+   194,
+   38,
+   36,
+   106
+  ],
+  [
+   38,
+   143,
+   26,
+   69
+  ],
+  [
+   36,
+   26,
+   191,
+   55
+  ],
+  [
+   106,
+   69,
+   55,
+   311
+  ]
+ ],
+ "counts": {
+  "players": 600,
+  "cells": 839,
+  "iplPlayers": 194,
+  "balls": 221164,
+  "cellsByLeague": [
+   194,
+   143,
+   191,
+   311
+  ]
+ },
+ "diagnostics": {
+  "rhatWorst": 1.0016335249708326,
+  "essMin": 5262.888199920124,
+  "essMedian": 7133.107754381346
+ },
+ "ppc": {
+  "obs": {
+   "sd of cell strike rates": 26.662538968071715,
+   "IQR of cell strike rates": 33.75,
+   "highest cell strike rate": 234.043,
+   "lowest cell strike rate": 33.333,
+   "sd, cells under 100 balls": 29.828830797345656,
+   "sd, cells over 300 balls": 14.6971271235931,
+   "share of cells above SR 150": 0.12753277711561384,
+   "share of cells below SR 100": 0.1799761620977354,
+   "share of impossible (SR < 0)": 0.0,
+   "ipl run rate (ball-weighted)": 139.51741078890322,
+   "cpl run rate (ball-weighted)": 128.2801955644454,
+   "bbl run rate (ball-weighted)": 130.19334092965858,
+   "t20i run rate (ball-weighted)": 130.43079692495243
+  },
+  "pval": {
+   "sd of cell strike rates": 0.93,
+   "IQR of cell strike rates": 0.08,
+   "highest cell strike rate": 0.6675,
+   "lowest cell strike rate": 0.0525,
+   "sd, cells under 100 balls": 1.0,
+   "sd, cells over 300 balls": 0.7225,
+   "share of cells above SR 150": 1.0,
+   "share of cells below SR 100": 0.0,
+   "share of impossible (SR < 0)": 1.0,
+   "ipl run rate (ball-weighted)": 0.3675,
+   "cpl run rate (ball-weighted)": 0.57,
+   "bbl run rate (ball-weighted)": 0.495,
+   "t20i run rate (ball-weighted)": 0.515
+  },
+  "rep_mean": {
+   "sd of cell strike rates": 28.188426742556874,
+   "IQR of cell strike rates": 31.581003968009362,
+   "highest cell strike rate": 244.16442266446253,
+   "lowest cell strike rate": 8.882413966668416,
+   "sd, cells under 100 balls": 37.35828106697408,
+   "sd, cells over 300 balls": 15.167482814609402,
+   "share of cells above SR 150": 0.19448152562574492,
+   "share of cells below SR 100": 0.12744934445768774,
+   "share of impossible (SR < 0)": 0.00037842669845053635,
+   "ipl run rate (ball-weighted)": 139.0872863712016,
+   "cpl run rate (ball-weighted)": 128.55143921539585,
+   "bbl run rate (ball-weighted)": 130.2077370500846,
+   "t20i run rate (ball-weighted)": 130.4590475768425
+  }
+ },
+ "compare": [
+  {
+   "model": "M0",
+   "waic": 1800.2875894636545,
+   "waic_se": 25.863965333844874,
+   "p_waic": 2.124634937238409,
+   "elpd_waic": -900.1437947318273,
+   "looic": 1800.292608301476,
+   "loo_se": 25.864825152586203,
+   "elpd_loo": -900.146304150738,
+   "khat_max": 0.16646466918901945,
+   "khat_bad": 0
+  },
+  {
+   "model": "M1",
+   "waic": 1633.5958498408013,
+   "waic_se": 17.071018633698987,
+   "p_waic": 117.04834567662972,
+   "elpd_waic": -816.7979249204006,
+   "looic": 1774.0806699191187,
+   "loo_se": 18.181171136192994,
+   "elpd_loo": -887.0403349595593,
+   "khat_max": 1.1560689770492236,
+   "khat_bad": 188
+  },
+  {
+   "model": "M2",
+   "waic": 1789.272129552607,
+   "waic_se": 25.277915734224834,
+   "p_waic": 39.70408620848656,
+   "elpd_waic": -894.6360647763036,
+   "looic": 1799.5294829065667,
+   "loo_se": 25.389609099405,
+   "elpd_loo": -899.7647414532834,
+   "khat_max": 0.8594383812135238,
+   "khat_bad": 9
+  },
+  {
+   "model": "M3",
+   "waic": 1756.8623200183492,
+   "waic_se": 32.38679090749956,
+   "p_waic": 45.32556677662522,
+   "elpd_waic": -878.4311600091746,
+   "looic": 1767.9748305957949,
+   "loo_se": 32.509668722893544,
+   "elpd_loo": -883.9874152978974,
+   "khat_max": 0.8894311023838228,
+   "khat_bad": 9
+  }
+ ],
+ "sensitivity": {
+  "Scout": {
+   "mu": 132.04476558774397,
+   "tau2": 138.24176285324762,
+   "sigma2": 53388.520162479836,
+   "delta": [
+    0.0,
+    -7.828005541840971,
+    -4.895081624640148,
+    -5.183634219421451
+   ],
+   "n_shortlist": 31,
+   "top10": [
+    "SA Yadav",
+    "AD Russell",
+    "GJ Maxwell",
+    "PD Salt",
+    "TH David",
+    "N Pooran",
+    "TM Head",
+    "LS Livingstone",
+    "H Klaasen",
+    "FH Allen"
+   ]
+  },
+  "Analyst": {
+   "mu": 132.1523628457448,
+   "tau2": 131.0591847445701,
+   "sigma2": 53876.082512958616,
+   "delta": [
+    0.0,
+    -7.81469881195182,
+    -4.925380949992853,
+    -5.21308559488279
+   ],
+   "n_shortlist": 28,
+   "top10": [
+    "SA Yadav",
+    "AD Russell",
+    "GJ Maxwell",
+    "TH David",
+    "PD Salt",
+    "N Pooran",
+    "TM Head",
+    "LS Livingstone",
+    "H Klaasen",
+    "FH Allen"
+   ]
+  },
+  "CFO": {
+   "mu": 132.57898017992144,
+   "tau2": 117.07549115489589,
+   "sigma2": 54948.31319493036,
+   "delta": [
+    0.0,
+    -8.024014488298338,
+    -5.093396064098266,
+    -5.402401647132351
+   ],
+   "n_shortlist": 26,
+   "top10": [
+    "SA Yadav",
+    "AD Russell",
+    "GJ Maxwell",
+    "TH David",
+    "PD Salt",
+    "N Pooran",
+    "TM Head",
+    "LS Livingstone",
+    "H Klaasen",
+    "FH Allen"
+   ]
+  },
+  "Stress": {
+   "mu": 137.79602361958652,
+   "tau2": 8.407969632911287,
+   "sigma2": 80758.26975903848,
+   "delta": [
+    0.0,
+    -9.480522110588442,
+    -7.626947244384807,
+    -7.635702918612
+   ],
+   "n_shortlist": 1,
+   "top10": [
+    "SA Yadav",
+    "N Pooran",
+    "GJ Maxwell",
+    "AD Russell",
+    "TH David",
+    "PD Salt",
+    "JC Buttler",
+    "LS Livingstone",
+    "F du Plessis",
+    "TM Head"
+   ]
+  }
+ }
+}

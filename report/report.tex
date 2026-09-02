@@ -11,8 +11,8 @@
 \maketitle
 \vspace{-2.2cm}
 \begin{center}\small\color{muted}
-Group project · Bayesian Statistics · IPM Term VII · Prof.\ Sayantan Banerjee · IIM Indore\\
-An interactive companion runs the model, the sampler and the shortlist in the browser.
+Group project · Bayesian Statistics\\
+Interactive companion: \url{https://devanshgohil07.github.io/t20-bayes-lab/}
 \end{center}
 \vspace{6pt}
 \hrule
@@ -34,10 +34,10 @@ with an overseas record but no IPL history it is the only method that gives an e
 %======================================================================
 \section{The business problem}
 
-Problem Set 5 opens with a national health agency comparing 30-day mortality rates across 50
-hospitals. A newspaper ranks the hospitals by their raw sample means and declares a small rural
-hospital with eight patients the best in the country. The ranking is not credible, because
-eight patients carry very little information about that hospital.
+A standard illustration of the problem runs as follows. A health agency compares 30-day
+mortality rates across 50 hospitals. A newspaper ranks the hospitals by their raw sample means
+and declares a small rural hospital with eight patients the best in the country. The ranking is
+not credible, because eight patients carry very little information about that hospital.
 
 An IPL auction ranks batters in the same way. A batter records a strike rate of 234, and that
 number is used to price him. The top fifteen of the raw IPL leaderboard for 2021--2024 have a
@@ -61,9 +61,9 @@ what the fitted model makes of it.
 
 \subsection{The decision rule}
 
-Following PS1 Q9(h)--(i) and PS1 Q11(i), inference and decision are kept apart. The model's
-job is to return a posterior for each batter's ability $\theta_i$, expressed as an expected
-IPL strike rate. The franchise's job is to say what it wants and how sure it needs to be:
+Inference and decision are kept apart. The model's job is to return a posterior for each
+batter's ability $\theta_i$, expressed as an expected IPL strike rate. The franchise's job is
+to say what it wants and how sure it needs to be:
 
 \[
 \text{shortlist batter } i \quad\Longleftrightarrow\quad
@@ -71,12 +71,19 @@ IPL strike rate. The franchise's job is to say what it wants and how sure it nee
 \]
 
 where $c$ is the strike rate the franchise is buying and $p$ is the confidence it requires.
-Our baseline is $c=140$, $p=0.80$. This is the rule in PS1 Q11(i) --- \emph{design a play for
-Arjun only if $\Pr(\theta > 0.40 \mid X) > 0.80$} --- applied to a different sport, with the
-probability estimated from MCMC output as in PS4 Q9(f).
+Our baseline is $c=140$, $p=0.80$. The probability is read straight off the MCMC output as the
+fraction of posterior draws for $\theta_i$ that exceed $c$.
 
 Both $c$ and $p$ are business choices, not statistical ones. Section~\ref{sec:decision} reports
 what happens when a scout, an analyst and a finance head set them differently.
+
+The setting gives those choices weight. An IPL franchise bids from a fixed purse (INR 120
+crore in 2025, of which at least 75\% must be spent), fills a squad of 18 to 25 players, and may
+sign at most eight overseas players, of whom at most four can appear in a given playing eleven
+(ESPNcricinfo, 2024). The overseas slots are therefore the scarcest and the most expensive
+positions on the sheet, and they are exactly the positions for which a franchise has the least
+IPL evidence. Section~\ref{sec:validation} shows that this is where the raw leaderboard fails
+completely rather than merely badly.
 
 %======================================================================
 \section{Data}\label{sec:data}
@@ -93,10 +100,12 @@ than 25 balls are dropped, which is what lets us treat $y$ as an approximately N
 Fitting uses 2021--2024. The 2025 IPL is held out entirely and never seen until
 Section~\ref{sec:validation}.
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T1a_data}
-\captionof{table}{The four competitions after filtering. ``Run rate'' is the ball-weighted mean
+\caption{The four competitions after filtering. ``Run rate'' is the ball-weighted mean
 strike rate, which is what a scorecard would report.}
-\vspace{6pt}
+\end{table}
 
 \subsection{Restricting T20 internationals to Full Member matches}
 
@@ -115,11 +124,13 @@ recognisable. Both shortlists are kept in the repository; the discarded one is
 
 \subsection{Bridge players and identification}
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T1b_overlap}
-\captionof{table}{Batters appearing in both competitions, 2021--2024. The diagonal is the number
+\caption{Batters appearing in both competitions, 2021--2024. The diagonal is the number
 of batters in that competition. Off-diagonal entries are the only source of information about
 the league offsets.}
-\vspace{6pt}
+\end{table}
 
 \nbridgeIplTtwoi\ batters link the IPL to T20 internationals, \nbridgeIplCpl\ to the CPL
 and \nbridgeIplBbl\ to the BBL. The IPL--T20I link is well supported. The CPL and BBL links
@@ -130,8 +141,8 @@ consequence appears in the width of the credible intervals in Section~\ref{sec:r
 \begin{figure}[H]\centering
 \includegraphics[width=0.95\linewidth]{../figs/F1_funnel.pdf}
 \caption{Left: every cell, against the number of balls behind it. The red curves are $\pm1$ and
-$\pm2$ sampling standard deviations around the IPL average --- the spread chance alone would
-produce. Right: the top of the raw IPL leaderboard and the careers behind it.}
+$\pm2$ sampling standard deviations around the IPL average, which is the spread chance alone
+would produce. Right: the top of the raw IPL leaderboard and the careers behind it.}
 \end{figure}
 
 Figure~1 shows the problem directly. Extreme strike rates almost all occur on the left of the
@@ -141,7 +152,11 @@ lie close to the average.
 %======================================================================
 \section{Model specification}
 
-We compare four models, following Sessions 17--18 and \emph{Bayes Rules!} Chapter 16.
+We compare four models, following the standard hierarchical treatment in Johnson, Ott and
+Dogucu (2022, ch.\ 16) and Gelman et al.\ (2013, ch.\ 5). The same idea has been applied
+to batting in baseball by Jensen, McShane and Wyner (2009) and to Test-match batting by
+Stevenson and Brewer (2017); what is new here is the league offset, which is what lets a
+batter with no IPL record be placed on the IPL scale at all.
 
 \textbf{M0, complete pooling.} A single $\theta$ for all batters. It cannot support a
 shortlist, but it is the baseline the other models are measured against.
@@ -177,9 +192,9 @@ IPL, and the benefit is one of interpretation:
 
 \begin{callout}
 With $\delta_{\text{IPL}}=0$, $\theta_i$ means exactly \textbf{``this batter's expected strike
-rate in the IPL''} --- including for batters who have never played in the IPL. Their CPL, BBL
-and T20I strike rates are translated onto the IPL scale by the fitted offsets. This is what
-makes the model usable for the decision stated in Section~1.
+rate in the IPL''}, including for batters who have never played in the IPL. Their CPL, BBL and
+T20I strike rates are translated onto the IPL scale by the fitted offsets. This is what makes
+the model usable for the decision stated in Section~1.
 \end{callout}
 
 \begin{figure}[H]\centering
@@ -193,15 +208,20 @@ groups of quantities that repeat: batters, leagues, and the cells we observe.}
 
 The priors are weakly informative. Each one is chosen so that it can be justified in a sentence.
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T2_priors}
-\captionof{table}{Priors, and where each number comes from.}
-\vspace{6pt}
+\caption{Priors, and where each number comes from.}
+\end{table}
 
 The prior for $\sigma^2$ is the one with a direct empirical basis. Runs off the bat are
 distributed as follows across the fitting window:
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T2b_ballruns}
-\vspace{6pt}
+\caption{The distribution of runs off the bat across the fitting window.}
+\end{table}
 
 giving $E[X]=\nballMean$, $\mathrm{Var}(X)=\nballVar$ and hence $\sigma^2 \approx
 \nsigmaSqBall$ on the strike-rate scale. We centre the prior there. Section~\ref{sec:results}
@@ -219,7 +239,7 @@ implied prior spread of batting ability.}
 \section{The Gibbs sampler}\label{sec:gibbs}
 
 All six full conditionals are available in closed form, so the sampler is a pure Gibbs
-sampler (Sessions 8--9). No Metropolis step is required. The model is additive, and an additive
+sampler. No Metropolis step is required. The model is additive, and an additive
 Normal model with conjugate priors remains conjugate throughout. A log link, which is the
 natural alternative for a rate, would have removed conjugacy for $\theta$ and required
 Metropolis-within-Gibbs. This is one reason the model is specified on the additive scale.
@@ -243,7 +263,7 @@ which is Normal by completing the square:
 \qquad V_i^{-1} = \sum_{c:\,p(c)=i}\frac{n_c}{\sigma^2} + \frac{1}{\tau^2}.
 \]
 The posterior precision is the precision from the batter's own record plus the precision from
-the population. This is PS4 Q3(e) and PS5 Q2(f).
+the population. This is the usual precision-weighted form for a Normal mean.
 
 \textbf{A special case worth noting.} With one league and one cell, $V_i^{-1} =
 n_i/\sigma^2 + 1/\tau^2$ and the mean collapses to
@@ -251,9 +271,9 @@ n_i/\sigma^2 + 1/\tau^2$ and the mean collapses to
 E(\theta_i \mid -) = w_i \bar{y}_i + (1-w_i)\mu,
 \qquad w_i = \frac{n_i \tau^2}{\sigma^2 + n_i \tau^2},
 \]
-which is PS5 Q1(b). Here $w_i$ is the share of the estimate that comes from the batter's own
-record and $1-w_i$ the share that comes from the population. It is the key quantity in the
-model, and the interactive companion provides a slider for it.
+which is the classical shrinkage form. Here $w_i$ is the share of the estimate that comes from
+the batter's own record and $1-w_i$ the share that comes from the population. It is the key
+quantity in the model, and the interactive companion provides a slider for it.
 
 \textbf{2. League offsets}, for $\ell \neq \text{IPL}$, with $s_c = y_c - \theta_{p(c)}$, by the
 same completion of the square over the cells played in league $\ell$:
@@ -276,8 +296,8 @@ contributing its own shape and scale:
 with $e_c = y_c - \theta_{p(c)} - \delta_{\ell(c)}$. The weight $n_c$ appears in the last one
 because the likelihood variance is $\sigma^2/n_c$, not $\sigma^2$.
 
-Each is a componentwise update in the sense of PS4 Q8: we sample one block at a time given the
-rest. The full derivations are in Appendix~A.
+Each is a componentwise update: we sample one block at a time given the rest. The full
+derivations are in Appendix~A.
 
 \subsection{Settings}
 
@@ -292,25 +312,29 @@ There are two separate questions here. Is the code correct, and have the chains 
 
 \subsection{Four checks on the code}
 
-The sandbox used for this project has no R installation, so we cannot cross-check against
-\texttt{rstanarm} or \texttt{brms}. The sampler is therefore tested directly.
+The sampler is written from scratch rather than called from a package, so it is tested
+directly against results we can derive or simulate.
 
 \begin{enumerate}
 \item \textbf{One batter, one league, against the closed form.} With $\mu$, $\tau^2$ and
-$\sigma^2$ pinned, the posterior must be the Normal--Normal answer from Sessions 3--4. The
-closed-form mean agrees with the $w\bar y + (1-w)\mu$ form to $10^{-14}$ (that part is algebra,
-not simulation), and the sampler's mean agrees with it to within 0.09 of a Monte Carlo standard
-error.
+$\sigma^2$ pinned, the posterior must be the closed-form Normal--Normal answer. The
+closed-form mean agrees with the $w\bar y + (1-w)\mu$ form exactly, to machine precision (that
+part is algebra, not simulation), and the sampler's mean agrees with it to within
+\ntestOneMcse\ of a Monte Carlo standard error.
 \item \textbf{Recovery from simulated data.} Generating from known $\theta$, $\delta$,
-$\sigma^2$, $\tau^2$ and $\omega^2$ and refitting recovers every one inside its 95\% credible
-interval, with 94.3\% of the true $\theta_i$ inside theirs.
-\item \textbf{Limiting cases (PS5 Q1(e)).} As $\tau^2$ falls through $400, 100, 25, 4, 1$ the
-posterior spread of $\theta$ collapses monotonically from 13.2 to 0.06 and lands on the
-complete-pooling value; as $\tau^2 \to \infty$ the posterior means reproduce the raw
-no-pooling means to within 3.0 Monte Carlo standard errors. One point is worth recording. A
+$\sigma^2$, $\tau^2$ and $\omega^2$ and refitting recovers every one of them inside its
+credible interval, and \ntestTwoCoverage\% of the 300 true $\theta_i$ fall inside their own 95\%
+intervals. The seven scalar checks use 99\% intervals rather than 95\%: at the 95\% level each
+check fails once in twenty by construction, so a seven-check suite would flag a correct sampler
+about 30\% of the time.
+\item \textbf{Limiting cases.} As $\tau^2$ falls through $400, 100, 25, 4, 1$ the
+posterior spread of $\theta$ collapses monotonically from \ntestThreeSpreadFirst\ to
+\ntestThreeSpreadLast\ and lands on the complete-pooling value; as $\tau^2 \to \infty$ the
+posterior means reproduce the raw no-pooling means to within \ntestThreeMaxZ\ Monte Carlo
+standard errors. One point is worth recording. A
 centred Gibbs sampler run at $\tau^2 = 10^{-6}$ does \emph{not} reach the complete-pooling
 answer in finite time. It stalls, because at that setting almost no information flows from the
-data to $\mu$. This is the mixing problem discussed in PS4 Q8(e) and Q13(e).
+data to $\mu$. This is the well-known mixing problem of centred parameterisations.
 \item \textbf{Two independent implementations.} The interactive companion runs the same six
 conditionals written from scratch in JavaScript, with a completely different random number
 generator (mulberry32 with Box--Muller, against NumPy's PCG64). On the same data the two agree:
@@ -322,11 +346,13 @@ implementations agreeing this closely is strong evidence that both are correct.
 
 \subsection{Convergence}
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T3_diagnostics}
-\captionof{table}{Posterior summaries and convergence diagnostics for M3. $\hat{R}$ is the split
+\caption{Posterior summaries and convergence diagnostics for M3. $\hat{R}$ is the split
 version; ESS is the Geyer initial-positive-sequence estimator. The last row is the worst case
 across all \nNplayers\ batter abilities.}
-\vspace{6pt}
+\end{table}
 
 The worst $\hat{R}$ anywhere in the model, including every one of the \nNplayers\ individual
 abilities, is \nrhatWorst. The smallest effective sample size is \nessMin, against 8{,}000
@@ -348,15 +374,15 @@ which is why the effective sample sizes are close to the number of draws.}
 \section{Posterior predictive checks}
 
 Convergence tells us that the sampler explored the posterior. It says nothing about whether
-the model describes the data. For that we use the posterior predictive check of \emph{Bayes
-Rules!} Chapter 10: simulate the data the fitted model would generate and compare it with the
-data observed. Following PS4 Q11(d), the replicated cells include fresh Normal errors and not
-only the fitted means.
+the model describes the data. For that we use a posterior predictive check (Johnson, Ott and
+Dogucu, 2022, ch.\ 10): simulate the data the fitted model would generate and compare it with
+the data observed. The replicated cells include fresh Normal errors and not only the fitted
+means, since a replicate must reproduce sampling variation as well as the fitted level.
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.92\linewidth]{../figs/F6_ppc.pdf}
 \caption{Left: 60 replicated datasets in grey against the real one in red. Right: one test
-statistic --- the spread of strike rates among cells with fewer than 100 balls.}
+statistic, the spread of strike rates among cells with fewer than 100 balls.}
 \end{figure}
 
 \textbf{What the model reproduces.} The ball-weighted run rate of each of the four
@@ -364,7 +390,7 @@ competitions is reproduced almost exactly. For the IPL it is \nppcIplRate\ obser
 \nppcIplRateRep\ replicated, a posterior predictive $p$-value of \nppcIplP, and the other three
 are equally unremarkable. The highest strike rate in the data is comfortably inside what the
 model expects. Crucially, after restricting T20Is to Full Member matches, the replicated data
-contain essentially no impossible values --- \nppcNegative\% of replicated cells fall below
+contain essentially no impossible values: \nppcNegative\% of replicated cells fall below
 zero, against 0.3\% before the restriction. The Normal likelihood survives its most obvious
 objection.
 
@@ -392,7 +418,7 @@ runs off the bat is \nsigmaSqBall. The ratio is \key{\ndesignEffect}.
 The gap is not an error. It is informative. If balls were independent given ability, there
 would be nowhere in the model for form, matchups, pitch conditions or batting position to go.
 Instead all of that variation enters $\sigma^2$, which is therefore an \emph{effective}
-per-ball variance rather than a pure sampling variance. PS5 Q1(g) gives the reasoning: once
+per-ball variance rather than a pure sampling variance. The reasoning is standard: once
 outcomes within a group are correlated, the effective sample size is smaller than the nominal
 one. Here 100 balls carry roughly the information of \neffBalls.
 
@@ -431,7 +457,7 @@ his record is long enough to be taken close to face value.
 
 The right-hand panel compares the shrinkage each batter actually experienced, computed from the
 posterior, with the theoretical weight $w = n\tau^2/(\sigma^2+n\tau^2)$. The two agree
-closely. The model is applying PS5 Q1(b) to \nNplayers\ batters.
+closely. The model is applying the same shrinkage formula to all \nNplayers\ batters.
 
 \subsection{League offsets}
 
@@ -440,7 +466,8 @@ closely. The model is applying PS5 Q1(b) to \nNplayers\ batters.
 \caption{Posterior distributions of the league offsets, against the IPL fixed at zero.}
 \end{figure}
 
-\begin{center}\small
+\begin{table}[H]
+\centering\small
 \begin{tabular}{lrr}
 \toprule
 League & $\delta_\ell$ & 95\% credible interval \\
@@ -450,33 +477,57 @@ BBL  & \ndeltaBbl   & (\ndeltaBblLo, \ndeltaBblHi) \\
 T20I & \ndeltaTtwoi & (\ndeltaTtwoiLo, \ndeltaTtwoiHi) \\
 \bottomrule
 \end{tabular}
-\end{center}
-\vspace{4pt}
+\caption{Posterior means and 95\% credible intervals for the league offsets.}
+\end{table}
 
 All three offsets are below the IPL and all three intervals exclude zero. The IPL is the
 highest-scoring of the four environments: a strike rate of 140 in the CPL reads as about
-$140\ndeltaCpl \approx 132$ on the IPL scale. The ordering, with the IPL above the BBL and
-elite T20Is and the CPL lowest, matches the published CricViz ranking of T20 standards, which
-uses the same bridge-player reasoning. We add credible intervals, which that ranking does not
-report. The CPL and BBL intervals are wide for the reason given in Section~\ref{sec:data}: only
-\nbridgeIplCpl\ and \nbridgeIplBbl\ batters respectively link those competitions to the IPL
-directly.
+$140\ndeltaCpl \approx 132$ on the IPL scale. The CPL and BBL intervals are wide for the reason
+given in Section~\ref{sec:data}: only \nbridgeIplCpl\ and \nbridgeIplBbl\ batters
+respectively link those competitions to the IPL directly.
 
-We describe $\delta_\ell$ as a \emph{scoring-environment offset} rather than a quality
-adjustment. It combines bowling standard, pitches, boundary sizes and format. The decision
-requires the translation between scales; it does not require knowing which of these is
-responsible.
+\subsection{Why these offsets are not a ranking of league quality}
+
+It is tempting to read $\delta_\ell$ as a league table. It is not one, and the CPL shows why.
+CricViz, using the same bridge-player logic on a different quantity, rate the CPL as one of the
+strongest competitions in world T20 and place T20 internationals below several domestic leagues
+(Wisden, 2020). Our offset puts the CPL lowest of the four. Both can be true, because they
+measure different things: CricViz measure \emph{standard}, and we measure \emph{scoring
+environment}.
+
+Our own data show the mechanism directly.
+
+\begin{table}[H]
+\centering\small
+\input{../tables/T7_league_profile}
+\caption{How each competition scores, 2021--2024. The CPL clears the rope most often and
+also plays the most dot balls, which is why its overall strike rate is the lowest of the four.}
+\end{table}
+
+The CPL hits a six more often than the IPL does, once every \nbpsCpl\ balls against
+\nbpsIpl, which is what CricViz observe. It also plays \ndotCpl\% dot balls against the IPL's
+\ndotIpl\%. Boundary hitting and dot balls move in opposite directions and the dots win, so the
+same batter scores more slowly there. The BBL is the mirror image: only one six every
+\nbpsBbl\ balls, on large grounds, but the fewest dots of the four.
+
+We therefore describe $\delta_\ell$ as a \emph{scoring-environment offset} and not as a quality
+adjustment. It combines bowling standard, pitches, boundary sizes and format in one number. The
+decision needs the translation between scales; it does not need to know which of those is
+responsible, and it would be wrong to present the offsets as a verdict on which league is
+harder.
 
 %======================================================================
 \section{Model comparison and predictive accuracy}\label{sec:compare}
 
 \subsection{Predictive accuracy using WAIC and LOO}
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T4_waic_loo}
-\captionof{table}{WAIC and PSIS-LOO for the four models, all evaluated on the same 194 IPL
+\caption{WAIC and PSIS-LOO for the four models, all evaluated on the same 194 IPL
 cells so that the numbers are comparable. $\hat{k}$ is the Pareto shape from PSIS; values above
 0.7 mean the estimate for that cell is unreliable.}
-\vspace{6pt}
+\end{table}
 
 Taken at face value, WAIC prefers M1, the raw leaderboard. The diagnostics show why this
 reading should not be accepted. M1 has one cell per batter and one parameter per batter, so the
@@ -499,11 +550,13 @@ stratified by how much IPL history the batter had \emph{before} 2025, because th
 quantity the argument turns on. \textbf{The structure of the table below was fixed before it
 was run.}
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T5_validation}
-\captionof{table}{Root mean squared error in predicting 2025 IPL strike rate, with bootstrap
+\caption{Root mean squared error in predicting 2025 IPL strike rate, with bootstrap
 standard errors, and coverage of the 95\% posterior predictive interval. Best in each row in
 bold.}
-\vspace{6pt}
+\end{table}
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.88\linewidth]{../figs/F9_validation.pdf}
@@ -518,9 +571,9 @@ played in the 2025 IPL with no prior IPL record but a record in the CPL, BBL or 
 M3 has an RMSE of \nrmseZeroOverseasMthree, against \nrmseZeroOverseasMtwo\ for IPL-only
 partial pooling and \nrmseZeroOverseasMzero\ for complete pooling, while \key{M1 gives no
 estimate at all}. For exactly the batters a franchise most needs to price, the conventional
-method does not simply perform worse; it is unavailable. This is the second case in PS5 Q5(i),
-a new student at an existing university: the hierarchy has a source of information for such a
-batter, so it produces a usable answer.
+method does not simply perform worse; it is unavailable. In hierarchical prediction terms this
+is a new unit inside a group that has already been observed: the hierarchy has a source of
+information for such a batter, so it produces a usable answer.
 
 \textbf{Batters with some IPL record.} Across all 85 of them the four models order as
 expected: M3 \nrmseRecordMthree, M2 \nrmseRecordMtwo, M0 \nrmseRecordMzero, M1
@@ -532,12 +585,12 @@ M3 has an RMSE of \nrmseMidMthree\ against \nrmseMidMone\ for the raw leaderboar
 predicts: at 300 balls and above, $w$ exceeds 0.8 and partial pooling has little left to add.
 We report this rather than claim an improvement that is not there.
 
-\textbf{Calibration.} The 95\% posterior predictive intervals cover \ncovMthree\%,
-\ncovMtwo\% and \ncovMzero\% of the actual 2025 strike rates. The no-pooling intervals cover
-\ncovMone\%. A franchise using raw strike rates is therefore overconfident as well as less
+\textbf{Calibration.} The 95\% posterior predictive intervals cover \ncovMthree\% of the
+actual 2025 strike rates under M3, \ncovMtwo\% under M2 and \ncovMzero\% under M0. The
+no-pooling intervals cover \ncovMone\%. A franchise using raw strike rates is therefore overconfident as well as less
 accurate. Part of the cause is structural: M1 is saturated, so it cannot estimate its own
-$\sigma^2$ --- the posterior for $\sigma^2$ behaves close to a random walk --- and has little
-information left with which to size its own uncertainty.
+$\sigma^2$, whose posterior behaves close to a random walk, and it has little information left
+with which to size its own uncertainty.
 
 \subsubsection*{The one group where the prediction went the other way}
 
@@ -549,10 +602,10 @@ returns its prior, so this row compares priors rather than models. The populatio
 all \nNplayers\ batters across four competitions and its $\mu$ is \nmuFit; the IPL-only models
 see only IPL regulars and sit near 138. A 2025 IPL debutant is not a random draw from world T20
 cricket, since somebody selected him, and the narrower prior happens to be better calibrated for
-this particular group. This is PS1 Q3(c), the limits of a population-level prior, and it is the
-selection-bias limitation appearing directly in the results.
+this particular group. This is the familiar limitation of a population-level prior, and it is
+the selection-bias limitation appearing directly in the results.
 
-The difference concerns priors for eighteen batters, not the likelihood, and it does not affect
+The difference concerns the prior for ten batters, not the likelihood, and it does not affect
 any group for which data exist. It also points to the natural extension: a population model that
 conditions on which competitions a batter has been selected for.
 
@@ -561,13 +614,14 @@ conditions on which competitions a batter has been selected for.
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.82\linewidth]{../figs/F10_shortlist.pdf}
-\caption{The shortlist at $c=140$, $p=0.80$, restricted to batters with at least 150 balls
-across the four competitions. Bars are 95\% credible intervals; the tick is the raw IPL strike
-rate where one exists; the number on the right is $\Pr(\theta_i > 140 \mid \text{data})$.}
+\caption{The top of the shortlist at $c=140$, $p=0.80$, restricted to batters with at least
+150 balls across the four competitions; \nshortAnalyst\ batters clear the bar in total. Bars are
+95\% credible intervals, the tick is the raw IPL strike rate where one exists, and the number on
+the right is $\Pr(\theta_i > 140 \mid \text{data})$.}
 \end{figure}
 
-At the baseline setting, \nshortAnalyst\ batters clear the threshold. The top of the list ---
-\ntopTen\ --- contains no surprises, which is a useful check: a method that produced an
+At the baseline setting, \nshortAnalyst\ batters clear the threshold. The top of the list
+(\ntopTen) contains no surprises, which is a useful check: a method that produced an
 unrecognisable list would not be trusted. The differences appear further down. \nmoverName\ is
 eleventh on the raw list at 166.7 and has $\Pr(\theta > 140) = 0.05$. Batters with strong
 overseas records and no IPL history appear on the model's list and cannot appear on the raw one
@@ -575,18 +629,20 @@ at all.
 
 \subsection{Prior sensitivity}
 
-Following PS1 Q1(b)--(c) and PS4 Q12(e), we do not vary the prior arbitrarily. We use the
-priors of three people who would plausibly disagree about the same decision.
+We do not vary the prior arbitrarily. We use the priors of three people who would plausibly
+disagree about the same decision.
 
+\begin{table}[H]
+\centering\small
 \input{../tables/T6_sensitivity}
-\captionof{table}{Prior sensitivity. The Scout believes ability really does vary; the CFO has
-watched franchises overpay for one good season. ``Stress'' is not a plausible belief --- it is
-a deliberate extreme in which almost all apparent difference between T20 batters is noise.}
-\vspace{6pt}
+\caption{Prior sensitivity. The Scout believes ability really does vary; the CFO has
+watched franchises overpay for one good season. ``Stress'' is not a plausible belief. It is a
+deliberate extreme in which almost all apparent difference between T20 batters is noise.}
+\end{table}
 
 \textbf{The three plausible priors agree.} They give an identical top ten, shortlists of
 \nshortScout, \nshortAnalyst\ and \nshortCfo\ batters, and Jaccard overlap between 0.90 and
-0.93. Following PS4 Q12(f), this insensitivity indicates that the data are informative: with
+0.93. This insensitivity indicates that the data are informative: with
 839 cells, and long careers for the batters who matter, the likelihood dominates the prior.
 
 \textbf{The stress test shows where the conclusion would break.} Setting $\tau \approx 2.9$,
@@ -620,8 +676,9 @@ sizes and format all enter a single number, which is why we call it a scoring-en
 offset. The T20I restriction in Section~\ref{sec:data} illustrates what happens when a
 ``league'' is not a single environment.
 
-\item \textbf{Balls are not conditionally independent.} PS1 Q11(j) lists the reasons ---
-defensive pressure, situation, fatigue, matchups. The fitted $\sigma^2$ is \ndesignEffect\
+\item \textbf{Balls are not conditionally independent.} The reasons are familiar: bowling
+matchups, field settings, fatigue, and where in the innings a batter arrives. The fitted
+$\sigma^2$ is \ndesignEffect\
 times the independence value, which is the model measuring exactly this. The clean fix stays
 conjugate: give each cell its own latent level, $y_c \sim N(\eta_c, \sigma^2/n_c)$ with
 $\eta_c \sim N(\theta_{p(c)} + \delta_{\ell(c)}, \kappa^2)$. This adds a seventh full
@@ -659,7 +716,33 @@ spells, puts the figure at $\pm$\nsdHundredFit. A decision taken on a raw strike
 neither.
 
 Everything in this report is reproducible from the repository, and the sampler runs in the
-browser so that a reader can change our priors and see the effect.
+browser at \url{https://devanshgohil07.github.io/t20-bayes-lab/}, so a reader can change our
+priors, move the decision threshold and see the effect on the shortlist directly.
+
+
+\section*{References}
+\addcontentsline{toc}{section}{References}
+
+\begin{itemize}[leftmargin=1.4em,itemsep=3pt]
+\item ESPNcricinfo (2024). IPL 2025 auction retention rules.
+  \url{https://www.espncricinfo.com/story/-1452396}.
+\item Gelman, A., Carlin, J.\ B., Stern, H.\ S., Dunson, D.\ B., Vehtari, A.\ and Rubin, D.\ B.
+  (2013). \emph{Bayesian Data Analysis}, 3rd edn. Chapman and Hall/CRC.
+\item Jensen, S.\ T., McShane, B.\ B.\ and Wyner, A.\ J.\ (2009). Hierarchical Bayesian
+  modeling of hitting performance in baseball. \emph{Bayesian Analysis} 4, 631--652.
+\item Johnson, A.\ A., Ott, M.\ Q.\ and Dogucu, M.\ (2022). \emph{Bayes Rules! An Introduction
+  to Applied Bayesian Modeling}. Chapman and Hall/CRC.
+\item Rushe, S.\ \emph{Cricsheet}: ball-by-ball data for men's T20 cricket.
+  \url{https://cricsheet.org}.
+\item Stevenson, O.\ G.\ and Brewer, B.\ J.\ (2017). Bayesian survival analysis of batsmen in
+  Test cricket. \emph{Journal of Quantitative Analysis in Sports} 13, 25--36.
+\item Vehtari, A., Gelman, A.\ and Gabry, J.\ (2017). Practical Bayesian model evaluation using
+  leave-one-out cross-validation and WAIC. \emph{Statistics and Computing} 27, 1413--1432.
+\item Wisden (2020). CricViz: an analytical guide to the major global T20 leagues; and CricViz:
+  why the IPL is higher quality than T20Is. \url{https://www.wisden.com}.
+\item Zhang, J.\ and Stephens, M.\ A.\ (2009). A new and efficient estimation method for the
+  generalized Pareto distribution. \emph{Technometrics} 51, 316--325.
+\end{itemize}
 
 \newpage
 \appendix
@@ -705,36 +788,6 @@ $k=L-1$ and $\mathrm{SS}=\sum \delta_\ell^2$ for $\omega^2$; $k=C$ and
 $\mathrm{SS}=\sum n_c(y_c-\theta_{p(c)}-\delta_{\ell(c)})^2$ for $\sigma^2$. The weight $n_c$
 appears because the likelihood variance is $\sigma^2/n_c$, not $\sigma^2$.
 
-\section{Where each piece of the course is used}
-
-\begin{center}\small
-\begin{tabular}{p{7.6cm}p{7.4cm}}
-\toprule
-What we use & Where it comes from \\
-\midrule
-Prior, posterior, posterior predictive & Session 2 \\
-Normal--Normal conjugacy, precision-weighted posterior mean & Sessions 3--4; \emph{Bayes Rules!} 5.1--5.3 \\
-Inverse-gamma prior for a variance & Sessions 3--5 \\
-Monte Carlo estimation of a posterior probability & Session 7; PS4 Q9(f) \\
-Gibbs sampling and full conditionals & Sessions 8--9 \\
-Componentwise updating; centring and mixing & PS4 Q8(c)--(e), Q13(e) \\
-Convergence diagnostics, $\hat{R}$, autocorrelation & Sessions 10--11; \emph{Bayes Rules!} 7.1--7.6 \\
-Posterior prediction from MCMC output; fresh errors & Session 12; PS4 Q10, Q11(d) \\
-Normal means and Bayesian regression machinery & Sessions 13--14 \\
-Hierarchical models, partial pooling, DAGs, plates & Sessions 17--18; \emph{Bayes Rules!} 16.1--16.5 \\
-Shrinkage weight $w = n\tau^2/(\sigma^2+n\tau^2)$ & PS5 Q1(b) \\
-Complete / no / partial pooling and limiting cases & PS5 Q1(e)--(f) \\
-Within-group correlation and effective sample size & PS5 Q1(g) \\
-Prediction for an existing unit, a new unit in a known group, and a new group & PS5 Q5(i) \\
-Posterior predictive checking and cross-validation & \emph{Bayes Rules!} Ch.\ 10 \\
-Separating inference from the decision rule & PS1 Q9(h)--(i), Q11(i) \\
-Prior sensitivity as competing stakeholders & PS1 Q1(b)--(c); PS4 Q12(e)--(f) \\
-Conditional independence and where it fails & PS1 Q11(j) \\
-Limits of a population-level prior for a brand-new unit & PS1 Q3(b)--(c) \\
-\bottomrule
-\end{tabular}
-\end{center}
-
 \newpage
 \section{The code}
 
@@ -770,19 +823,19 @@ Path & What it does \\
 \end{tabular}
 \end{center}
 
-\subsection*{C.1\quad \texttt{prep/build\_data.py}}
+\subsection*{B.1\quad \texttt{prep/build\_data.py}}
 \lstinputlisting[language=Python]{../prep/build_data.py}
 
-\subsection*{C.2\quad \texttt{analysis/gibbs.py} --- the sampler}
+\subsection*{B.2\quad \texttt{analysis/gibbs.py}: the sampler}
 \lstinputlisting[language=Python]{../analysis/gibbs.py}
 
-\subsection*{C.3\quad \texttt{analysis/diagnostics.py}}
+\subsection*{B.3\quad \texttt{analysis/diagnostics.py}}
 \lstinputlisting[language=Python]{../analysis/diagnostics.py}
 
-\subsection*{C.4\quad \texttt{app/js/gibbs.js} --- the same sampler, independently written}
+\subsection*{B.4\quad \texttt{app/js/gibbs.js}: the same sampler, independently written}
 \lstinputlisting[language=Java]{../app/js/gibbs.js}
 
-\subsection*{C.5\quad \texttt{app/js/rng.js} --- Box--Muller and Marsaglia--Tsang in the browser}
+\subsection*{B.5\quad \texttt{app/js/rng.js}: Box--Muller and Marsaglia--Tsang in the browser}
 \lstinputlisting[language=Java]{../app/js/rng.js}
 
 \end{document}

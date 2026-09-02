@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Beyond Strike Rate — a Bayesian look at T20 batting</title>
+<title>Beyond Strike Rate: a Bayesian look at T20 batting</title>
 <meta name="description" content="Hierarchical Bayesian estimation of T20 batting ability across the IPL, CPL, BBL and T20 internationals. An interactive lab.">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -14,7 +14,6 @@
     <h1>Beyond Strike Rate
       <small>Estimating batting ability across the IPL, CPL, BBL and T20 internationals with a hierarchical Bayesian model.</small>
     </h1>
-    <p class="byline">Bayesian Statistics · IPM Term VII · Prof. Sayantan Banerjee · IIM Indore</p>
     <nav id="nav" role="tablist">
       <button role="tab" data-tab="problem" aria-selected="true">1 · The problem</button>
       <button role="tab" data-tab="conjugate">2 · Conjugate lab</button>
@@ -91,20 +90,19 @@
 <section class="tab" id="tab-conjugate">
   <h2>One batter, one prior, one posterior</h2>
   <p class="lede">
-    This is the Normal–Normal update from Sessions 3–4, with a real player in it. Pick
-    someone, tell the model what you believed about T20 batters before you saw them play, and
-    watch the three curves. The number that decides everything is <span class="eq">w</span>:
-    the share of the answer that comes from the player's own record rather than from the
-    population.
+    This is the Normal–Normal conjugate update with a real player in it. Pick someone, tell the
+    model what you believed about T20 batters before you saw them play, and watch the three
+    curves. The number that decides everything is <span class="eq">w</span>: the share of the
+    answer that comes from the player's own record rather than from the population.
   </p>
 
   <div class="grid g2">
     <div>
       <canvas id="c-conj"></canvas>
       <div class="key">
-        <span><i style="background:#9aa3ad"></i>prior — what you believed beforehand</span>
-        <span><i style="background:#2f5d8c"></i>likelihood — what this player did</span>
-        <span><i style="background:#b3122b"></i>posterior — what you should believe now</span>
+        <span><i style="background:#9aa3ad"></i>prior: what you believed beforehand</span>
+        <span><i style="background:#2f5d8c"></i>likelihood: what this player did</span>
+        <span><i style="background:#b3122b"></i>posterior: what you should believe now</span>
       </div>
     </div>
     <div class="panel">
@@ -131,8 +129,8 @@
     </div>
   </div>
   <p class="note">
-    That formula is PS5 Q1(b). Slide the ball count to 10 and the player almost disappears
-    into the population; slide it to 1200 and the population almost disappears into the player.
+    Slide the ball count to 10 and the player almost disappears into the population; slide it
+    to 1200 and the population almost disappears into the player.
   </p>
 </section>
 
@@ -158,10 +156,10 @@
     <div class="panel">
       <div class="ctl"><label>Model</label>
         <select id="sel-model">
-          <option value="M0">M0 — everyone is the same player</option>
-          <option value="M1">M1 — everyone is their own player</option>
-          <option value="M2">M2 — partial pooling, IPL only</option>
-          <option value="M3" selected>M3 — partial pooling + league offsets</option>
+          <option value="M0">M0: everyone is the same player</option>
+          <option value="M1">M1: everyone is their own player</option>
+          <option value="M2">M2: partial pooling, IPL only</option>
+          <option value="M3" selected>M3: partial pooling plus league offsets</option>
         </select>
       </div>
       <div class="ctl">
@@ -210,8 +208,8 @@
       <canvas id="c-shrink"></canvas>
       <div class="key">
         <span><i style="background:#9aa3ad"></i>raw IPL strike rate</span>
-        <span><i style="background:#b3122b"></i>posterior mean, falls</span>
-        <span><i style="background:#2f5d8c"></i>posterior mean, rises</span>
+        <span><i style="background:#b3122b"></i>posterior mean, moves down</span>
+        <span><i style="background:#2f5d8c"></i>posterior mean, moves up</span>
       </div>
     </div>
     <div class="panel">
@@ -239,7 +237,8 @@
     A strike rate of 140 in the CPL is not the same as 140 in the IPL. The model estimates one
     offset per league, a translation between scales, from the batters who appear in more than
     one of them. Fixing the IPL offset at zero is what makes every θ readable as an expected IPL
-    strike rate.
+    strike rate. These offsets describe the scoring environment, not the standard of the league;
+    the note below the table explains why the two are different.
   </p>
 
   <div class="grid g2">
@@ -263,6 +262,19 @@
         <tbody id="t-offsets"></tbody></table>
     </div>
   </div>
+  <div class="panel" style="margin-top:22px">
+    <span class="tag">these offsets are not a league table</span>
+    <p style="margin-top:10px">
+      It is tempting to read δ as a ranking of league quality. It is not one, and the CPL shows
+      why. Analysts who rank the <em>standard</em> of T20 competitions, using the same
+      bridge-player logic on a different quantity, place the CPL among the strongest in the
+      world. Our offset puts it lowest of the four. Both can be true, because we are measuring
+      the <em>scoring environment</em> rather than the standard.
+    </p>
+    <div id="tbl-profile"></div>
+    <p class="note" id="n-profile" style="margin-top:10px"></p>
+  </div>
+
   <div class="panel" style="margin-top:22px">
     <span class="tag">a data decision worth recording</span>
     <p style="margin-top:10px">
@@ -310,10 +322,10 @@
       </div>
       <div class="ctl"><label>Whose prior?</label>
         <select id="sel-prior">
-          <option value="Analyst" selected>Analyst — the report's baseline</option>
-          <option value="Scout">Scout — ability really does vary</option>
-          <option value="CFO">CFO — most of it is noise</option>
-          <option value="Stress">Stress test — almost all of it is noise</option>
+          <option value="Analyst" selected>Analyst: the report's baseline</option>
+          <option value="Scout">Scout: ability really does vary</option>
+          <option value="CFO">CFO: most of it is noise</option>
+          <option value="Stress">Stress test: almost all of it is noise</option>
         </select>
       </div>
       <p style="font-size:14px;margin:14px 0 4px" class="eq">
@@ -354,7 +366,7 @@
   <div class="wrap">
     <p>Data: <a href="https://cricsheet.org">Cricsheet</a> ball-by-ball archives for the IPL,
     CPL, BBL and men's T20 internationals, 2021–2024 for fitting and 2025 IPL for testing.
-    Everything on this page — sampler, diagnostics, plots — is plain JavaScript with no
+    Everything on this page (sampler, diagnostics, plots) is plain JavaScript with no
     libraries; the Python that produced the report is in <code>analysis/</code>.</p>
     <p id="foot-nums"></p>
   </div>

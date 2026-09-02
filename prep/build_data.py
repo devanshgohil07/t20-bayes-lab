@@ -1,5 +1,5 @@
 """
-Beyond Strike Rate — data preparation.
+Beyond Strike Rate: data preparation.
 
 Reads the four Cricsheet CSV (csv2) archives, restricts to 2021-2025, aggregates
 ball-by-ball deliveries to player x league cells, and writes:
@@ -100,6 +100,24 @@ json.dump({
   "cells": [{"p": pidx[r.striker], "n": int(r.n), "y": round(float(r.y), 3)}
             for r in test.itertuples()],
 }, open("data/holdout.json", "w"))
+
+# Per-league ball outcome profile. A league's strike rate is the net of how often the
+# ball goes for nothing and how often it clears the rope, and those two move separately.
+prof = []
+for name, idx in LEAGUES.items():
+    r = df[(df["league"] == idx) & (df["year"] <= 2024)]["runs_off_bat"].to_numpy(float)
+    prof.append({"league": name, "balls": int(len(r)),
+                 "sr": round(100 * r.mean(), 1),
+                 "dot": round(100 * (r == 0).mean(), 1),
+                 "four": round(100 * (r == 4).mean(), 1),
+                 "six": round(100 * (r == 6).mean(), 1),
+                 "ballsPerSix": round(len(r) / max((r == 6).sum(), 1), 1)})
+json.dump(prof, open("data/league_profile.json", "w"), indent=1)
+print("\nPer-league ball outcome profile (2021-2024):")
+print(f"  {'league':6s} {'balls':>8s} {'SR':>7s} {'dot%':>6s} {'four%':>6s} {'six%':>6s} {'balls/six':>10s}")
+for x in prof:
+    print(f"  {x['league']:6s} {x['balls']:8,d} {x['sr']:7.1f} {x['dot']:6.1f} "
+          f"{x['four']:6.1f} {x['six']:6.1f} {x['ballsPerSix']:10.1f}")
 
 # Empirical per-ball run distribution (training window) -> sigma^2 for the prior.
 tr = df[df["year"] <= 2024]

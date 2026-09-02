@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beyond Strike Rate — a Bayesian look at T20 batting</title>
+<meta name="description" content="Hierarchical Bayesian estimation of T20 batting ability across the IPL, CPL, BBL and T20 internationals. An interactive lab.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Beyond Strike Rate
+      <small>Estimating batting ability across the IPL, CPL, BBL and T20 internationals with a hierarchical Bayesian model.</small>
+    </h1>
+    <p class="byline">Bayesian Statistics · IPM Term VII · Prof. Sayantan Banerjee · IIM Indore</p>
+    <nav id="nav" role="tablist">
+      <button role="tab" data-tab="problem" aria-selected="true">1 · The problem</button>
+      <button role="tab" data-tab="conjugate">2 · Conjugate lab</button>
+      <button role="tab" data-tab="gibbs">3 · Gibbs lab</button>
+      <button role="tab" data-tab="shrink">4 · Shrinkage</button>
+      <button role="tab" data-tab="offsets">5 · League offsets</button>
+      <button role="tab" data-tab="decision">6 · The decision</button>
+      <button role="tab" data-tab="method">Method</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============================================================ 1 ===== -->
+<section class="tab on" id="tab-problem">
+  <h2>How much of a strike rate is noise?</h2>
+  <p class="lede">
+    An IPL auction ranks batters by strike rate. A strike rate is an average over a small
+    number of balls, and such averages move around on their own. Before fitting any model, it
+    is worth seeing how much of that movement is chance.
+  </p>
+
+  <div class="stat">
+    <div><div class="big" id="k-sd">–</div><small>strike-rate points of sampling noise in a
+      100-ball strike rate, from the run distribution alone</small></div>
+    <div><div class="big" id="k-cells">–</div><small>player × league cells,
+      2021–2024, minimum 25 balls</small></div>
+    <div><div class="big" id="k-balls">–</div><small>legal balls faced, wides excluded</small></div>
+  </div>
+
+  <div class="grid g2">
+    <div>
+      <canvas id="c-funnel"></canvas>
+      <div class="key">
+        <span><i style="background:#2f5d8c"></i>IPL</span>
+        <span><i style="background:#c1663e"></i>CPL</span>
+        <span><i style="background:#4f8a5b"></i>BBL</span>
+        <span><i style="background:#8a6bab"></i>T20I</span>
+        <span><i style="background:rgba(179,18,43,.35)"></i>±2 sampling SD around the IPL average</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ctl">
+        <label>Minimum balls faced <b id="v-minballs">25</b></label>
+        <input type="range" id="s-minballs" min="25" max="800" step="5" value="25">
+      </div>
+      <p class="note" style="margin-top:-4px">
+        Raise the threshold and the top of the leaderboard empties out. The names that remain
+        are the ones with enough balls behind their strike rate to be informative.
+      </p>
+      <h3 style="margin-top:20px">Raw IPL leaderboard</h3>
+      <table><thead><tr><th>Batter</th><th>Balls</th><th>SR</th></tr></thead>
+      <tbody id="t-leader"></tbody></table>
+      <p class="note" id="n-leader"></p>
+    </div>
+  </div>
+
+  <h3>Where the ±16.7 comes from</h3>
+  <p>
+    A ball off the bat produces 0, 1, 2, 4 or 6 runs, and almost nothing else. Count those
+    across all <span id="k-ballcount">–</span> deliveries in our window and you get a mean of
+    <span id="k-mean">–</span> runs per ball and a variance of <span id="k-var">–</span>. On the
+    ×100 scale a strike rate uses, that is a per-ball variance of
+    <span id="k-sigma2">–</span>, so the standard deviation of an observed strike rate off
+    <em>n</em> balls is <span class="eq">σ/√n</span>. Put <em>n</em> = 100 and you get
+    <span class="hl" id="k-sd2">–</span> strike-rate points. This number requires no model;
+    it follows from counting runs.
+  </p>
+  <div class="panel" style="margin-top:14px"><div id="tbl-ballruns"></div></div>
+</section>
+
+<!-- ============================================================ 2 ===== -->
+<section class="tab" id="tab-conjugate">
+  <h2>One batter, one prior, one posterior</h2>
+  <p class="lede">
+    This is the Normal–Normal update from Sessions 3–4, with a real player in it. Pick
+    someone, tell the model what you believed about T20 batters before you saw them play, and
+    watch the three curves. The number that decides everything is <span class="eq">w</span>:
+    the share of the answer that comes from the player's own record rather than from the
+    population.
+  </p>
+
+  <div class="grid g2">
+    <div>
+      <canvas id="c-conj"></canvas>
+      <div class="key">
+        <span><i style="background:#9aa3ad"></i>prior — what you believed beforehand</span>
+        <span><i style="background:#2f5d8c"></i>likelihood — what this player did</span>
+        <span><i style="background:#b3122b"></i>posterior — what you should believe now</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label>Batter</label><select id="sel-player"></select></div>
+      <div class="ctl">
+        <label>Prior mean <span class="eq">μ₀</span> <b id="v-m0">130</b></label>
+        <input type="range" id="s-m0" min="100" max="170" step="1" value="130">
+      </div>
+      <div class="ctl">
+        <label>Prior SD <span class="eq">τ</span> <b id="v-tau">15</b></label>
+        <input type="range" id="s-tau" min="1" max="45" step="0.5" value="15">
+      </div>
+      <div class="ctl">
+        <label>Balls faced (this player) <b id="v-nballs">–</b></label>
+        <input type="range" id="s-nballs" min="10" max="1200" step="5" value="200">
+      </div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+      <p style="font-size:14px;margin:0 0 6px" class="eq">
+        w = nτ² / (σ² + nτ²)
+      </p>
+      <div class="big" id="v-w" style="font-size:34px">–</div>
+      <div class="bar"><div id="bar-w"></div></div>
+      <p class="note" id="n-conj" style="margin-top:12px"></p>
+    </div>
+  </div>
+  <p class="note">
+    That formula is PS5 Q1(b). Slide the ball count to 10 and the player almost disappears
+    into the population; slide it to 1200 and the population almost disappears into the player.
+  </p>
+</section>
+
+<!-- ============================================================ 3 ===== -->
+<section class="tab" id="tab-gibbs">
+  <h2>Run the sampler yourself</h2>
+  <p class="lede">
+    Every result on this site comes from a Gibbs sampler with six closed-form full
+    conditionals, so no Metropolis step is needed. The same sampler is written here in
+    JavaScript and runs in your browser on the real data. Press run to see four chains, started
+    from different values, converge to the same posterior.
+  </p>
+
+  <div class="grid g2">
+    <div>
+      <canvas id="c-trace1"></canvas>
+      <canvas id="c-trace2" style="margin-top:10px"></canvas>
+      <div class="grid g2e" style="margin-top:10px">
+        <canvas id="c-acf"></canvas>
+        <canvas id="c-post"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label>Model</label>
+        <select id="sel-model">
+          <option value="M0">M0 — everyone is the same player</option>
+          <option value="M1">M1 — everyone is their own player</option>
+          <option value="M2">M2 — partial pooling, IPL only</option>
+          <option value="M3" selected>M3 — partial pooling + league offsets</option>
+        </select>
+      </div>
+      <div class="ctl">
+        <label>Iterations per chain <b id="v-iters">6000</b></label>
+        <input type="range" id="s-iters" min="1000" max="20000" step="500" value="6000">
+      </div>
+      <div class="ctl">
+        <label>Burn-in <b id="v-burn">2000</b></label>
+        <input type="range" id="s-burn" min="0" max="8000" step="250" value="2000">
+      </div>
+      <div class="ctl">
+        <label>Prior mean <span class="eq">m₀</span> <b id="v-gm0">130</b></label>
+        <input type="range" id="s-gm0" min="100" max="170" step="1" value="130">
+      </div>
+      <div class="ctl">
+        <label>Prior <span class="eq">E[τ]</span> <b id="v-gtau">15</b></label>
+        <input type="range" id="s-gtau" min="3" max="40" step="1" value="15">
+      </div>
+      <button class="go" id="btn-run">Run 4 chains</button>
+      <div class="bar" style="margin-top:12px"><div id="bar-run"></div></div>
+      <h3>Diagnostics</h3>
+      <table><thead><tr><th></th><th>mean</th><th>R̂</th><th>ESS</th></tr></thead>
+        <tbody id="t-diag"><tr><td colspan="4" class="note">Not run yet.</td></tr></tbody></table>
+      <p class="note" id="n-gibbs"></p>
+    </div>
+  </div>
+  <p class="note">
+    R̂ compares the spread between chains with the spread within them; anything above about
+    1.01 means the chains have not agreed yet. ESS says how many genuinely independent draws
+    the run is worth. Both are defined exactly as in <code>analysis/diagnostics.py</code>, and
+    the browser sampler reproduces the Python posterior means to within Monte Carlo error.
+  </p>
+</section>
+
+<!-- ============================================================ 4 ===== -->
+<section class="tab" id="tab-shrink">
+  <h2>What happens to the leaderboard</h2>
+  <p class="lede">
+    Partial pooling moves every batter part of the way toward the population mean, and it
+    moves the batters we have seen least the furthest. The raw IPL strike rate and the posterior
+    mean are shown side by side for the batters at the top of the raw list.
+  </p>
+
+  <div class="grid g2">
+    <div>
+      <canvas id="c-shrink"></canvas>
+      <div class="key">
+        <span><i style="background:#9aa3ad"></i>raw IPL strike rate</span>
+        <span><i style="background:#b3122b"></i>posterior mean, falls</span>
+        <span><i style="background:#2f5d8c"></i>posterior mean, rises</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ctl">
+        <label>Between-player SD <span class="eq">τ</span> <b id="v-stau">11.4</b></label>
+        <input type="range" id="s-stau" min="2" max="35" step="0.5" value="11.4">
+      </div>
+      <p class="note">
+        A small <span class="eq">τ</span> says T20 batters differ very little, so every
+        estimate collapses onto the average. A large <span class="eq">τ</span> says ability
+        genuinely varies, so each batter's own record is taken close to face value. The fitted
+        value is <b id="v-taufit">11.4</b>.
+      </p>
+      <h3>Biggest movers</h3>
+      <table><thead><tr><th>Batter</th><th>Balls</th><th>Raw</th><th>θ</th><th>Rank</th></tr></thead>
+        <tbody id="t-movers"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 5 ===== -->
+<section class="tab" id="tab-offsets">
+  <h2>What a strike rate is worth in each league</h2>
+  <p class="lede">
+    A strike rate of 140 in the CPL is not the same as 140 in the IPL. The model estimates one
+    offset per league, a translation between scales, from the batters who appear in more than
+    one of them. Fixing the IPL offset at zero is what makes every θ readable as an expected IPL
+    strike rate.
+  </p>
+
+  <div class="grid g2">
+    <div>
+      <canvas id="c-offsets"></canvas>
+      <p class="note">
+        Posterior distributions of <span class="eq">δ</span>. A value of −8 means that this
+        league's strike rates read about eight points low once you put them on the IPL scale.
+      </p>
+    </div>
+    <div class="panel">
+      <h3>Who does the translating</h3>
+      <p class="note" style="margin-top:-4px">
+        Bridge players: the number appearing in both leagues. Every offset is identified by
+        these people and nobody else, so the table is the honest measure of how much to
+        believe the numbers on the left.
+      </p>
+      <div id="tbl-overlap"></div>
+      <h3>The fitted offsets</h3>
+      <table><thead><tr><th>League</th><th>δ</th><th>95% interval</th></tr></thead>
+        <tbody id="t-offsets"></tbody></table>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:22px">
+    <span class="tag">a data decision worth recording</span>
+    <p style="margin-top:10px">
+      Our first run used every men's T20 international in the Cricsheet archive. Those matches
+      involve <b>105 different national teams</b>, from India and Australia to Estonia, Mongolia
+      and Bhutan. That is not a single scoring environment, and no single offset can describe
+      it. The model returned a shortlist headed by batters from associate nations who had
+      recorded very high strike rates against much weaker bowling. We therefore keep only T20Is
+      in which both sides are ICC Full Members. The bridge to the IPL lost one player out of
+      107.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================ 6 ===== -->
+<section class="tab" id="tab-decision">
+  <h2>From a posterior to a shortlist</h2>
+  <p class="lede">
+    Inference and decision are separate steps. The model returns a posterior for each batter.
+    The franchise decides what strike rate it is buying and how sure it needs to be. Set those
+    two numbers below and the shortlist follows. It is not the same list the raw strike rates
+    give.
+  </p>
+
+  <div class="grid g2">
+    <div>
+      <canvas id="c-decision"></canvas>
+      <p class="note">
+        Each bar is a 95% credible interval for that player's IPL strike rate; the dot is the
+        posterior mean and the tick is their raw IPL strike rate where they have one.
+      </p>
+    </div>
+    <div class="panel">
+      <div class="ctl">
+        <label>We want a strike rate above <b id="v-thresh">140</b></label>
+        <input type="range" id="s-thresh" min="110" max="180" step="1" value="140">
+      </div>
+      <div class="ctl">
+        <label>and we need to be this sure <b id="v-cut">0.80</b></label>
+        <input type="range" id="s-cut" min="0.5" max="0.99" step="0.01" value="0.80">
+      </div>
+      <div class="ctl">
+        <label>Minimum balls faced anywhere <b id="v-minb2">150</b></label>
+        <input type="range" id="s-minb2" min="25" max="600" step="25" value="150">
+      </div>
+      <div class="ctl"><label>Whose prior?</label>
+        <select id="sel-prior">
+          <option value="Analyst" selected>Analyst — the report's baseline</option>
+          <option value="Scout">Scout — ability really does vary</option>
+          <option value="CFO">CFO — most of it is noise</option>
+          <option value="Stress">Stress test — almost all of it is noise</option>
+        </select>
+      </div>
+      <p style="font-size:14px;margin:14px 0 4px" class="eq">
+        pick player i if P(θᵢ &gt; c | data) &gt; p
+      </p>
+      <p class="note" id="n-decision"></p>
+    </div>
+  </div>
+
+  <div class="grid g2e" style="margin-top:24px">
+    <div>
+      <h3>Bayesian shortlist</h3>
+      <table><thead><tr><th>Batter</th><th>Balls, all leagues</th><th>θ</th><th>P(θ&gt;c)</th></tr></thead>
+        <tbody id="t-short"></tbody></table>
+    </div>
+    <div>
+      <h3>Raw strike-rate shortlist</h3>
+      <table><thead><tr><th>Batter</th><th>IPL balls</th><th>Raw SR</th><th>P(θ&gt;c)</th></tr></thead>
+        <tbody id="t-raw"></tbody></table>
+    </div>
+  </div>
+  <p class="note" style="margin-top:16px" id="n-overlap"></p>
+</section>
+
+<!-- ========================================================= method ===== -->
+<section class="tab" id="tab-method">
+  <h2>Method</h2>
+  <p class="lede">
+    The whole model on one page: what we assume, what we estimate, how it is sampled, and where
+    it is limited.
+  </p>
+  <div id="method-body"></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Data: <a href="https://cricsheet.org">Cricsheet</a> ball-by-ball archives for the IPL,
+    CPL, BBL and men's T20 internationals, 2021–2024 for fitting and 2025 IPL for testing.
+    Everything on this page — sampler, diagnostics, plots — is plain JavaScript with no
+    libraries; the Python that produced the report is in <code>analysis/</code>.</p>
+    <p id="foot-nums"></p>
+  </div>
+</footer>
+
+<script src="js/rng.js"></script>
+<script src="js/gibbs.js"></script>
+<script src="js/plots.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

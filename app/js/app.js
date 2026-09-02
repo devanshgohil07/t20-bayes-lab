@@ -11,10 +11,10 @@ const commas = v => v.toLocaleString('en-US');
 
 let DATA = {};
 
-Promise.all(['cells', 'summary', 'draws', 'prob', 'offsets', 'meta', 'validation', 'altpriors']
+Promise.all(['cells', 'summary', 'prob', 'offsets', 'meta', 'altpriors']
   .map(f => fetch('data/' + f + '.json').then(r => r.json())))
-  .then(([cells, summary, draws, prob, offsets, meta, validation, alt]) => {
-    DATA = { cells, summary, draws, prob, offsets, meta, validation, alt };
+  .then(([cells, summary, prob, offsets, meta, alt]) => {
+    DATA = { cells, summary, prob, offsets, meta, alt };
     prep();
     boot();
   })
@@ -171,7 +171,7 @@ function tabConjugate() {
   const order = DATA.summary.players.map((nm, i) => ({ nm, i }))
     .filter(r => DATA.iplBalls[r.i] >= 25)
     .sort((a, b) => DATA.iplBalls[b.i] - DATA.iplBalls[a.i]);
-  sel.innerHTML = order.map(r => '<option value="' + r.i + '">' + r.nm + ' — ' +
+  sel.innerHTML = order.map(r => '<option value="' + r.i + '">' + r.nm + ', ' +
     commas(DATA.iplBalls[r.i]) + ' balls, SR ' + fmt(DATA.iplSR[r.i]) + '</option>').join('');
   sel.value = order[0].i;
 
@@ -415,7 +415,7 @@ function tabOffsets() {
     const dens = [1, 2, 3].map(j => P.density(off.delta[j], -16, 6, 200));
     const mx = Math.max.apply(null, dens.map(d => Math.max.apply(null, d.ys)));
     ch.ylim = [0, mx * 1.25];
-    ch.axes({ xlab: 'δ — strike-rate points relative to the IPL', yticks: [] });
+    ch.axes({ xlab: 'δ, strike-rate points relative to the IPL', yticks: [] });
     dens.forEach((d, k) => {
       const j = k + 1;
       ch.band(d.xs, d.xs.map(() => 0), d.ys, { color: hexa(C.league[j], .22) });
@@ -433,6 +433,26 @@ function tabOffsets() {
       ov.map((row, a) => '<tr><td>' + LN[a] + '</td>' + row.map((v, b) =>
         '<td class="num"' + (a === b ? ' style="color:var(--muted)"' : '') + '>' + v + '</td>')
         .join('') + '</tr>').join('') + '</tbody></table>';
+    const prof = DATA.meta.leagueProfile || [];
+    if (prof.length) {
+      const nm = { ipl: 'IPL', cpl: 'CPL', bbl: 'BBL', t20i: 'T20I' };
+      $('#tbl-profile').innerHTML =
+        '<table><thead><tr><th>League</th><th>Balls</th><th>Strike rate</th>' +
+        '<th>Dot balls</th><th>Fours</th><th>Balls per six</th></tr></thead><tbody>' +
+        prof.map(x => '<tr><td>' + nm[x.league] + '</td><td class="num">' + commas(x.balls) +
+          '</td><td class="num">' + x.sr.toFixed(1) + '</td><td class="num">' + x.dot.toFixed(1) +
+          '%</td><td class="num">' + x.four.toFixed(1) + '%</td><td class="num">' +
+          x.ballsPerSix.toFixed(1) + '</td></tr>').join('') + '</tbody></table>';
+      const byName = {}; prof.forEach(x => byName[x.league] = x);
+      $('#n-profile').textContent =
+        'The CPL hits a six more often than the IPL does, once every ' +
+        byName.cpl.ballsPerSix.toFixed(1) + ' balls against ' + byName.ipl.ballsPerSix.toFixed(1) +
+        '. It also plays ' + byName.cpl.dot.toFixed(1) + '% dot balls against the IPL\'s ' +
+        byName.ipl.dot.toFixed(1) + '%. Boundary hitting and dot balls move in opposite ' +
+        'directions and the dots win, so the same batter scores more slowly there. The BBL is ' +
+        'the mirror image: one six every ' + byName.bbl.ballsPerSix.toFixed(1) +
+        ' balls on large grounds, but the fewest dots of the four.';
+    }
     const f = DATA.meta.fitted;
     $('#t-offsets').innerHTML = [1, 2, 3].map(j =>
       '<tr><td>' + LN[j] + '</td><td class="num">' + fmt(f.delta[j], 1) +

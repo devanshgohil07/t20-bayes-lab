@@ -1,5 +1,5 @@
 /* Random number generation for the browser.
-   randn : Box-Muller (Sessions 8-9 notes)
+   randn : Box-Muller transform
    randGamma : Marsaglia-Tsang (2000)
    randInvGamma : X ~ Gamma(a, rate b)  =>  1/X ~ InvGamma(a, b)
    A seeded generator (mulberry32) is used so a run in the browser is reproducible. */

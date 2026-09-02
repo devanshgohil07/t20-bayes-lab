@@ -1,0 +1,57 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage[scaled=0.90]{helvet}
+\usepackage{courier}
+\usepackage{amsmath,amssymb}
+\usepackage[margin=2.45cm,top=2.3cm,bottom=2.4cm]{geometry}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[font=small,labelfont=bf,labelsep=period,skip=4pt]{caption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[hidelinks,colorlinks=true,linkcolor=accent,citecolor=accent,urlcolor=accent]{hyperref}
+
+\definecolor{accent}{HTML}{B3122B}
+\definecolor{ink}{HTML}{14181F}
+\definecolor{muted}{HTML}{6B7280}
+\definecolor{rule}{HTML}{D8DCE2}
+\definecolor{panel}{HTML}{F6F7F9}
+
+\titleformat{\section}{\normalfont\large\bfseries\color{ink}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries\color{ink}}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{13pt plus 3pt minus 3pt}{4pt}
+\titlespacing*{\subsection}{0pt}{9pt plus 2pt minus 2pt}{3pt}
+
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.05}
+
+\newcommand{\key}[1]{\textcolor{accent}{\textbf{#1}}}
+\newsavebox{\calloutbox}
+\newenvironment{callout}
+  {\par\vspace{5pt}\noindent\begingroup\color{ink}%
+   \setlength{\fboxsep}{10pt}\begin{lrbox}{\calloutbox}%
+   \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}\small}
+  {\end{minipage}\end{lrbox}\colorbox{panel}{\usebox{\calloutbox}}\endgroup\par\vspace{7pt}}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{accent},
+  commentstyle=\color{muted}\itshape,
+  stringstyle=\color{ink},
+  numbers=left, numberstyle=\tiny\color{muted}, numbersep=7pt,
+  breaklines=true, breakatwhitespace=false, columns=fullflexible,
+  showstringspaces=false, frame=single, rulecolor=\color{rule},
+  backgroundcolor=\color{panel}, xleftmargin=16pt, framexleftmargin=16pt,
+  aboveskip=8pt, belowskip=8pt, tabsize=2
+}
+\lstset{style=code}
+\lstset{extendedchars=true, inputencoding=utf8,
+  literate={§}{{\S}}1 {·}{{$\cdot$}}1 {—}{{---}}1 {'}{{'}}1 {"}{{"}}1}
+\lstdefinestyle{codewide}{style=code, basicstyle=\ttfamily\tiny}

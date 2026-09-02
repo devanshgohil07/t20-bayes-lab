@@ -34,30 +34,30 @@
   "sdAt100": 16.7
  },
  "fitted": {
-  "mu": 132.19,
-  "tau2": 131.0,
-  "sigma2": 53871.0,
+  "mu": 132.18,
+  "tau2": 130.9,
+  "sigma2": 53865.0,
   "omega2": 53.9,
   "sigmaEff": 232.1,
   "sdAt100Fitted": 23.2,
   "designEffect": 1.93,
   "delta": [
    0.0,
-   -7.9,
-   -4.97,
-   -5.25
+   -7.86,
+   -4.92,
+   -5.21
   ],
   "deltaLo": [
    0.0,
-   -11.68,
-   -8.49,
-   -8.16
+   -11.8,
+   -8.48,
+   -8.13
   ],
   "deltaHi": [
    0.0,
-   -4.03,
-   -1.49,
-   -2.41
+   -4.0,
+   -1.36,
+   -2.36
   ]
  },
  "overlap": [
@@ -86,6 +86,44 @@
    311
   ]
  ],
+ "leagueProfile": [
+  {
+   "league": "ipl",
+   "balls": 64785,
+   "sr": 138.7,
+   "dot": 36.6,
+   "four": 12.2,
+   "six": 6.4,
+   "ballsPerSix": 15.7
+  },
+  {
+   "league": "cpl",
+   "balls": 29109,
+   "sr": 127.5,
+   "dot": 42.2,
+   "four": 9.8,
+   "six": 6.9,
+   "ballsPerSix": 14.6
+  },
+  {
+   "league": "bbl",
+   "balls": 49387,
+   "sr": 129.5,
+   "dot": 36.0,
+   "four": 10.9,
+   "six": 4.5,
+   "ballsPerSix": 22.2
+  },
+  {
+   "league": "t20i",
+   "balls": 81720,
+   "sr": 129.7,
+   "dot": 38.6,
+   "four": 11.1,
+   "six": 5.4,
+   "ballsPerSix": 18.4
+  }
+ ],
  "counts": {
   "players": 600,
   "cells": 839,
@@ -99,9 +137,9 @@
   ]
  },
  "diagnostics": {
-  "rhatWorst": 1.0016335249708326,
-  "essMin": 5262.888199920124,
-  "essMedian": 7133.107754381346
+  "rhatWorst": 1.001617048557989,
+  "essMin": 5443.878045399431,
+  "essMedian": 7075.520991368237
  },
  "ppc": {
   "obs": {
@@ -120,98 +158,98 @@
    "t20i run rate (ball-weighted)": 130.43079692495243
   },
   "pval": {
-   "sd of cell strike rates": 0.93,
-   "IQR of cell strike rates": 0.08,
-   "highest cell strike rate": 0.6675,
-   "lowest cell strike rate": 0.0525,
+   "sd of cell strike rates": 0.9275,
+   "IQR of cell strike rates": 0.075,
+   "highest cell strike rate": 0.6875,
+   "lowest cell strike rate": 0.0575,
    "sd, cells under 100 balls": 1.0,
-   "sd, cells over 300 balls": 0.7225,
+   "sd, cells over 300 balls": 0.7175,
    "share of cells above SR 150": 1.0,
    "share of cells below SR 100": 0.0,
    "share of impossible (SR < 0)": 1.0,
-   "ipl run rate (ball-weighted)": 0.3675,
-   "cpl run rate (ball-weighted)": 0.57,
-   "bbl run rate (ball-weighted)": 0.495,
-   "t20i run rate (ball-weighted)": 0.515
+   "ipl run rate (ball-weighted)": 0.3875,
+   "cpl run rate (ball-weighted)": 0.55,
+   "bbl run rate (ball-weighted)": 0.53,
+   "t20i run rate (ball-weighted)": 0.5025
   },
   "rep_mean": {
-   "sd of cell strike rates": 28.188426742556874,
-   "IQR of cell strike rates": 31.581003968009362,
-   "highest cell strike rate": 244.16442266446253,
-   "lowest cell strike rate": 8.882413966668416,
-   "sd, cells under 100 balls": 37.35828106697408,
-   "sd, cells over 300 balls": 15.167482814609402,
-   "share of cells above SR 150": 0.19448152562574492,
-   "share of cells below SR 100": 0.12744934445768774,
-   "share of impossible (SR < 0)": 0.00037842669845053635,
-   "ipl run rate (ball-weighted)": 139.0872863712016,
-   "cpl run rate (ball-weighted)": 128.55143921539585,
-   "bbl run rate (ball-weighted)": 130.2077370500846,
-   "t20i run rate (ball-weighted)": 130.4590475768425
+   "sd of cell strike rates": 28.196135278450086,
+   "IQR of cell strike rates": 31.527433632008925,
+   "highest cell strike rate": 244.43125372226604,
+   "lowest cell strike rate": 9.23302599722106,
+   "sd, cells under 100 balls": 37.37094451526368,
+   "sd, cells over 300 balls": 15.18068600053989,
+   "share of cells above SR 150": 0.19557210965435043,
+   "share of cells below SR 100": 0.1274672228843862,
+   "share of impossible (SR < 0)": 0.0003456495828367104,
+   "ipl run rate (ball-weighted)": 139.19189700934024,
+   "cpl run rate (ball-weighted)": 128.5810244260483,
+   "bbl run rate (ball-weighted)": 130.37497718357506,
+   "t20i run rate (ball-weighted)": 130.48880715412898
   }
  },
  "compare": [
   {
    "model": "M0",
-   "waic": 1800.2875894636545,
-   "waic_se": 25.863965333844874,
-   "p_waic": 2.124634937238409,
-   "elpd_waic": -900.1437947318273,
-   "looic": 1800.292608301476,
-   "loo_se": 25.864825152586203,
-   "elpd_loo": -900.146304150738,
-   "khat_max": 0.16646466918901945,
+   "waic": 1800.275966604936,
+   "waic_se": 25.867812878291257,
+   "p_waic": 2.1172365352007203,
+   "elpd_waic": -900.137983302468,
+   "looic": 1800.280523382321,
+   "loo_se": 25.86892571743495,
+   "elpd_loo": -900.1402616911605,
+   "khat_max": 0.2145459908696881,
    "khat_bad": 0
   },
   {
    "model": "M1",
-   "waic": 1633.5958498408013,
-   "waic_se": 17.071018633698987,
-   "p_waic": 117.04834567662972,
-   "elpd_waic": -816.7979249204006,
-   "looic": 1774.0806699191187,
-   "loo_se": 18.181171136192994,
-   "elpd_loo": -887.0403349595593,
-   "khat_max": 1.1560689770492236,
-   "khat_bad": 188
+   "waic": 1631.3382079137823,
+   "waic_se": 17.009612361324052,
+   "p_waic": 116.53821362176072,
+   "elpd_waic": -815.6691039568911,
+   "looic": 1774.2265845985999,
+   "loo_se": 17.623417616756722,
+   "elpd_loo": -887.1132922992999,
+   "khat_max": 1.1866341650077321,
+   "khat_bad": 185
   },
   {
    "model": "M2",
-   "waic": 1789.272129552607,
-   "waic_se": 25.277915734224834,
-   "p_waic": 39.70408620848656,
-   "elpd_waic": -894.6360647763036,
-   "looic": 1799.5294829065667,
-   "loo_se": 25.389609099405,
-   "elpd_loo": -899.7647414532834,
-   "khat_max": 0.8594383812135238,
-   "khat_bad": 9
+   "waic": 1789.6389495364404,
+   "waic_se": 25.27143135463462,
+   "p_waic": 39.496981971598586,
+   "elpd_waic": -894.8194747682202,
+   "looic": 1799.6897025000321,
+   "loo_se": 25.281695400708983,
+   "elpd_loo": -899.8448512500161,
+   "khat_max": 0.8647058102112132,
+   "khat_bad": 11
   },
   {
    "model": "M3",
-   "waic": 1756.8623200183492,
-   "waic_se": 32.38679090749956,
-   "p_waic": 45.32556677662522,
-   "elpd_waic": -878.4311600091746,
-   "looic": 1767.9748305957949,
-   "loo_se": 32.509668722893544,
-   "elpd_loo": -883.9874152978974,
-   "khat_max": 0.8894311023838228,
+   "waic": 1756.7142487124888,
+   "waic_se": 32.51088991796812,
+   "p_waic": 45.28570712692777,
+   "elpd_waic": -878.3571243562444,
+   "looic": 1768.3862645781765,
+   "loo_se": 32.543768155182875,
+   "elpd_loo": -884.1931322890882,
+   "khat_max": 0.9249485737034577,
    "khat_bad": 9
   }
  ],
  "sensitivity": {
   "Scout": {
-   "mu": 132.04476558774397,
-   "tau2": 138.24176285324762,
-   "sigma2": 53388.520162479836,
+   "mu": 131.95636729956192,
+   "tau2": 138.46091465389765,
+   "sigma2": 53314.203702910796,
    "delta": [
     0.0,
-    -7.828005541840971,
-    -4.895081624640148,
-    -5.183634219421451
+    -7.770044897422662,
+    -4.811841476671575,
+    -5.10139400183282
    ],
-   "n_shortlist": 31,
+   "n_shortlist": 29,
    "top10": [
     "SA Yadav",
     "AD Russell",
@@ -221,51 +259,51 @@
     "N Pooran",
     "TM Head",
     "LS Livingstone",
-    "H Klaasen",
-    "FH Allen"
+    "FH Allen",
+    "H Klaasen"
    ]
   },
   "Analyst": {
-   "mu": 132.1523628457448,
-   "tau2": 131.0591847445701,
-   "sigma2": 53876.082512958616,
+   "mu": 132.14061813299884,
+   "tau2": 131.12352380331103,
+   "sigma2": 53782.83384904592,
    "delta": [
     0.0,
-    -7.81469881195182,
-    -4.925380949992853,
-    -5.21308559488279
+    -7.823007241342811,
+    -4.900301407518227,
+    -5.179483449523861
    ],
    "n_shortlist": 28,
    "top10": [
     "SA Yadav",
     "AD Russell",
     "GJ Maxwell",
-    "TH David",
     "PD Salt",
+    "TH David",
     "N Pooran",
     "TM Head",
     "LS Livingstone",
-    "H Klaasen",
-    "FH Allen"
+    "FH Allen",
+    "H Klaasen"
    ]
   },
   "CFO": {
-   "mu": 132.57898017992144,
-   "tau2": 117.07549115489589,
-   "sigma2": 54948.31319493036,
+   "mu": 132.52513577270702,
+   "tau2": 118.03803769749504,
+   "sigma2": 54890.48767337258,
    "delta": [
     0.0,
-    -8.024014488298338,
-    -5.093396064098266,
-    -5.402401647132351
+    -7.971925507650679,
+    -5.10412895348384,
+    -5.359112695647655
    ],
    "n_shortlist": 26,
    "top10": [
     "SA Yadav",
     "AD Russell",
     "GJ Maxwell",
-    "TH David",
     "PD Salt",
+    "TH David",
     "N Pooran",
     "TM Head",
     "LS Livingstone",
@@ -274,14 +312,14 @@
    ]
   },
   "Stress": {
-   "mu": 137.79602361958652,
-   "tau2": 8.407969632911287,
-   "sigma2": 80758.26975903848,
+   "mu": 137.86932059912564,
+   "tau2": 8.320848038120221,
+   "sigma2": 80826.90717748662,
    "delta": [
     0.0,
-    -9.480522110588442,
-    -7.626947244384807,
-    -7.635702918612
+    -9.573780253214085,
+    -7.708857696824861,
+    -7.688220098254812
    ],
    "n_shortlist": 1,
    "top10": [
@@ -293,8 +331,8 @@
     "PD Salt",
     "JC Buttler",
     "LS Livingstone",
-    "F du Plessis",
-    "TM Head"
+    "TM Head",
+    "F du Plessis"
    ]
   }
  }

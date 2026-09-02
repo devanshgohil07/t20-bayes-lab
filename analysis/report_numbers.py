@@ -18,6 +18,7 @@ cmp_ = json.load(open(os.path.join(OUT, "compare.json")))
 ppc = json.load(open(os.path.join(OUT, "ppc.json")))["M3"]
 sens = json.load(open(os.path.join(OUT, "sensitivity.json")))
 t4 = json.load(open(os.path.join(OUT, "test4.json")))
+tst = json.load(open(os.path.join(OUT, "tests.json")))
 dg = json.load(open(os.path.join(OUT, "diag_summary.json")))
 raw_ipl, ipl_balls = dataio.weighted_mean_by_player(ipl)
 
@@ -98,6 +99,21 @@ s("jsMu", f"{[r for r in t4['rows'] if r['param']=='mu'][0]['js']:.2f}")
 s("pyMu", f"{[r for r in t4['rows'] if r['param']=='mu'][0]['python']:.2f}")
 s("jsThetaCorr", f"{t4['thetaCorr']:.4f}"); s("jsThetaRmse", f"{t4['thetaRMSE']:.2f}")
 s("jsMaxZ", f"{max(r['z'] for r in t4['rows']):.2f}")
+
+# correctness-test results
+s("testOneMcse", f"{tst['t1_mcse_ratio']:.2f}")
+s("testTwoCoverage", f"{tst['t2_theta_coverage']*100:.1f}")
+s("testThreeSpreadFirst", f"{tst['t3_spread_first']:.1f}")
+s("testThreeSpreadLast", f"{tst['t3_spread_last']:.2f}")
+s("testThreeMaxZ", f"{tst['t3_maxz']:.1f}")
+
+# per-league ball profile
+prof = {x["league"]: x for x in json.load(open(os.path.join(ROOT, "data", "league_profile.json")))}
+for k, nm in (("ipl", "Ipl"), ("cpl", "Cpl"), ("bbl", "Bbl"), ("t20i", "Ttwoi")):
+    s(f"dot{nm}", f"{prof[k]['dot']:.1f}")
+    s(f"six{nm}", f"{prof[k]['six']:.1f}")
+    s(f"bps{nm}", f"{prof[k]['ballsPerSix']:.1f}")
+    s(f"srRaw{nm}", f"{prof[k]['sr']:.1f}")
 
 # headline movers
 gid = D["ipl_players"]; post = th[:, gid].mean(axis=0)

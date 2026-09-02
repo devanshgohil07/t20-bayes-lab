@@ -1,4 +1,6 @@
-"""Split R-hat, effective sample size, autocorrelation — Gelman et al. (BDA3 §11.4)."""
+"""Split R-hat, effective sample size and autocorrelation, following Gelman et al. (2013).
+
+Bayesian Data Analysis, 3rd edn, section 11.4."""
 import numpy as np
 
 def split_rhat(x):

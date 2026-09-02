@@ -59,4 +59,12 @@ for m in ("M2", "M3"):
 json.dump([{k: (float(v) if isinstance(v, (np.floating, float)) else v)
             for k, v in r.items()} for r in rows],
           open(os.path.join(OUT, "diagnostics.json"), "w"), indent=1)
+
+# Worst-case diagnostics over every theta in M3, which is the number the report quotes.
+th = fits["M3"]["theta"]
+rh = np.array([dg.split_rhat(th[:, :, i]) for i in range(th.shape[2])])
+es = np.array([dg.ess(th[:, :, i]) for i in range(0, th.shape[2], 10)])
+json.dump({"rhatWorst": float(np.nanmax(rh)), "essMin": float(es.min()),
+           "essMedian": float(np.median(es))},
+          open(os.path.join(OUT, "diag_summary.json"), "w"), indent=1)
 print("\nsaved out/draws.npz and out/diagnostics.json")

@@ -17,13 +17,19 @@ P3 = lambda k: z[f"M3_{k}"].reshape(-1, *z[f"M3_{k}"].shape[2:])
 th3 = P3("theta"); dl3 = P3("delta"); s23 = P3("sigma2"); mu3 = P3("mu"); tau3 = P3("tau2")
 raw_ipl, ipl_balls = dataio.weighted_mean_by_player(ipl)
 
+# Per-ball variance on the strike-rate scale, taken from the data rather than hard coded.
+_br = json.load(open(os.path.join(ROOT, "data", "ballruns.json")))
+_v = np.array(_br["values"], float); _c = np.array(_br["counts"], float)
+_m1 = (_v * _c).sum() / _c.sum()
+SIGMA2_BALL = ((_v ** 2 * _c).sum() / _c.sum() - _m1 ** 2) * 1e4
+
 # ============================================================ F1  funnel ===
 def f1():
     fig, axes = plt.subplots(1, 2, figsize=(8.4, 4.0),
                              gridspec_kw=dict(width_ratios=[1.25, 1]))
     ax = axes[0]
     iplmean = np.sum(ipl.n * ipl.y) / np.sum(ipl.n)
-    sig = np.sqrt(25465.0)
+    sig = np.sqrt(SIGMA2_BALL)
     nn = np.logspace(np.log10(20), np.log10(ipl.n.max() * 1.2), 200)
     other = full.l != IPL
     ax.scatter(full.n[other], full.y[other], s=6, color="#c9ced6", alpha=.45, lw=0,
@@ -41,9 +47,6 @@ def f1():
                 xy=(40, iplmean + 1.96 * sig / np.sqrt(40)), xytext=(150, 243),
                 fontsize=8.5, color=ACCENT, ha="left",
                 arrowprops=dict(arrowstyle="-", color=ACCENT, lw=.8))
-    title(ax, "F1 · Strike rate against balls faced",
-          "Red curves: ±1 and ±2 sampling standard deviations around the IPL average.")
-
     ax = axes[1]
     o = np.argsort(-ipl.y)[:15]
     yy = np.arange(len(o))[::-1]
@@ -55,10 +58,12 @@ def f1():
     ax.set_xlabel("IPL balls faced behind that strike rate")
     ax.set_xlim(0, max(ipl.n[o]) * 1.5)
     med = int(np.median(ipl.n[o]))
-    noise = np.sqrt(25465.0 / med)
-    title(ax, "The top of the raw leaderboard",
-          f"Median balls behind it: {med}, giving ±{noise:.0f} points of sampling noise.")
+    noise = np.sqrt(SIGMA2_BALL / med)
+    ax.set_title("The top of the raw leaderboard", loc="left", fontsize=9.5, color=INK, pad=6)
     fig.tight_layout()
+    figtitle(fig, "F1 · Strike rate against balls faced",
+             "Red curves: ±1 and ±2 sampling SD around the IPL average.")
+    ax.set_xlabel(f"IPL balls faced (median {med}, worth ±{noise:.0f} SR of noise)")
     save(fig, "F1_funnel", FIGS)
 
 # =============================================================== F2  DAG ===
@@ -118,16 +123,15 @@ def f3():
             density=True, label="actually observed")
     ax.set_xlabel("strike rate"); ax.set_yticks([])
     ax.legend(fontsize=8.5)
-    title(ax, "F3 · Prior predictive check",
-          "Cell strike rates simulated from the priors alone, before seeing any data.")
     ax = axes[1]
     ax.hist(np.sqrt(tau2), bins=50, color=LEAGUE["bbl"], alpha=.6, density=True)
     ax.axvline(np.sqrt(np.median(tau2)), color=INK, lw=1.1, ls="--")
     ax.set_xlabel("prior spread of player ability, $\\tau$ (strike-rate points)")
     ax.set_yticks([]); ax.set_xlim(0, 60)
-    title(ax, "  ", "Prior median $\\tau$ = %.1f: most players within roughly ±%.0f of the mean."
-          % (np.sqrt(np.median(tau2)), 2 * np.sqrt(np.median(tau2))))
     fig.tight_layout()
+    figtitle(fig, "F3 · Prior predictive check",
+             "Cell strike rates simulated from the priors alone, before seeing any data. "
+             "Prior median $\\tau$ = %.1f." % np.sqrt(np.median(tau2)), top=0.80)
     save(fig, "F3_prior_predictive", FIGS)
 
 # ============================================================ F4 traces ====
@@ -152,9 +156,10 @@ def f4():
         if r < 3:
             axes[r, 0].set_xticklabels([])
     axes[3, 0].set_xlabel("draw (after 4,000 burn-in, thinned by 4)")
-    title(axes[0, 0], "F4 · Trace plots for the four global parameters (M3)",
-          "Each colour is one chain; the panel on the right is the pooled posterior.")
     fig.tight_layout()
+    figtitle(fig, "F4 · Trace plots for the four global parameters (M3)",
+             "Each colour is one chain; the panel on the right is the pooled posterior.",
+             top=0.93)
     save(fig, "F4_traces", FIGS)
 
 # ============================================================== F5  ACF ====
@@ -168,9 +173,9 @@ def f5():
         a.set_xlabel("lag")
         a.set_ylim(-.15, 1.02)
     axes[0].set_ylabel("autocorrelation", fontsize=9)
-    title(axes[0], "F5 · Autocorrelation of the thinned draws (M3)",
-          "Values near zero by lag 5 indicate that the sampler is mixing well.")
     fig.tight_layout()
+    figtitle(fig, "F5 · Autocorrelation of the thinned draws (M3)",
+             "Values near zero by lag 5 indicate that the sampler is mixing well.", top=0.74)
     save(fig, "F5_acf", FIGS)
 
 # ============================================================== F6  PPC ====
@@ -187,8 +192,6 @@ def f6():
     ax.set_ylim(-60, 280)
     ax.text(.98, .04, "grey = 60 replicated datasets\nred = the real one", transform=ax.transAxes,
             ha="right", fontsize=8.5, color=MUTED)
-    title(ax, "F6 · Posterior predictive check",
-          "Data the fitted model would generate, against the data we saw.")
     ax = axes[1]
     reps = np.array([np.std(r[n < 100]) for r in yrep])
     ax.hist(reps, bins=35, color=MUTED, alpha=.6)
@@ -197,8 +200,10 @@ def f6():
     ax.set_yticks([])
     ax.text(.03, .93, "the model expects short spells to be\nnoisier than they are",
             transform=ax.transAxes, fontsize=8.5, color=MUTED, va="top")
-    title(ax, "  ", "One test statistic; red line is the observed value.")
     fig.tight_layout()
+    figtitle(fig, "F6 · Posterior predictive check",
+             "Left: data the fitted model would generate, against the data observed. "
+             "Right: one test statistic, with the observed value in red.", top=0.83)
     save(fig, "F6_ppc", FIGS)
 
 # ========================================================= F7  shrinkage ===
@@ -233,8 +238,8 @@ def f7(topk=22):
     ax.set_xlabel("strike rate")
     ax.grid(axis="y", visible=False)
     fell = int(np.sum(rank_post[sel] > rank_raw[sel]))
-    title(ax, "F7 · The leaderboard after partial pooling",
-          f"Top {topk} by raw IPL strike rate. Grey = raw, coloured = posterior. {fell} of {topk} fall.")
+    ax.set_title("Raw strike rate and posterior mean", loc="left", fontsize=9.5, color=INK,
+                 pad=6)
 
     ax = axes[1]
     tot = np.bincount(full.p, weights=full.n, minlength=full.P)[gid]
@@ -252,36 +257,42 @@ def f7(topk=22):
                label="each IPL batter, realised")
     ax.set_xscale("log"); ax.set_ylim(0, 1.05)
     ax.set_xlabel("total balls faced across all four leagues (log scale)")
-    ax.set_ylabel("weight the model puts on the player's own record")
+    ax.set_ylabel("weight on the batter's own record")
     ax.legend(fontsize=8.5, loc="upper left")
-    for nb in (50, 200, 800):
+    for nb, dy in ((50, .14), (200, -.11), (800, -.13)):
         wv = nb * tau3.mean() / (s23.mean() + nb * tau3.mean())
         ax.annotate(f"{nb} balls → {wv:.0%} own record", xy=(nb, wv),
-                    xytext=(nb * 1.6, wv - .13), fontsize=8, color=INK,
+                    xytext=(nb * 1.7, wv + dy), fontsize=8, color=INK,
                     arrowprops=dict(arrowstyle="-", lw=.7, color=MUTED))
-    title(ax, "Weight on the batter's own record", "PS5 Q1(b), applied to these data.")
+    ax.set_title("Shrinkage weight, theory and practice", loc="left", fontsize=9.5,
+                 color=INK, pad=6)
     fig.tight_layout()
+    figtitle(fig, "F7 · The leaderboard after partial pooling",
+             f"Top {topk} by raw IPL strike rate. Grey = raw, coloured = posterior mean. "
+             f"{fell} of {topk} move down.", top=0.86)
     save(fig, "F7_shrinkage", FIGS)
 
 # =========================================================== F8  offsets ===
 def f8():
     fig, ax = plt.subplots(figsize=(7.2, 3.6))
     from scipy.stats import gaussian_kde
-    xs = np.linspace(-22, 10, 400)
+    xs = np.linspace(-20, 8, 400)
     for j in (1, 2, 3):
         k = gaussian_kde(dl3[:, j])
-        ax.fill_between(xs, k(xs), color=LCOL[j], alpha=.35, lw=0)
-        ax.plot(xs, k(xs), color=LCOL[j], lw=1.6, label=LNAME[j])
-        m = float(dl3[:, j].mean()); lo, hi = np.percentile(dl3[:, j], [2.5, 97.5])
-        peak = float(k(m)[0])
-        ax.text(m, peak * 1.04, f"{LNAME[j]}  {m:+.1f}  [{lo:+.1f}, {hi:+.1f}]",
-                ha="center", fontsize=8.5, color=LCOL[j])
+        ax.fill_between(xs, k(xs), color=LCOL[j], alpha=.32, lw=0)
+        ax.plot(xs, k(xs), color=LCOL[j], lw=1.7)
     ax.axvline(0, color=INK, lw=1.4)
-    ax.set_ylim(0, ax.get_ylim()[1] * 1.18)
-    ax.text(.6, ax.get_ylim()[1] * .95, "IPL = 0 by construction", fontsize=8.5, color=INK,
-            va="top")
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.30)
+    top = ax.get_ylim()[1]
+    # One label per league, stacked so that they can never collide with each other.
+    for r, j in enumerate((1, 2, 3)):
+        m = float(dl3[:, j].mean()); lo, hi = np.percentile(dl3[:, j], [2.5, 97.5])
+        ax.text(-19.5, top * (0.95 - 0.085 * r),
+                f"{LNAME[j]}   {m:+.1f}   [{lo:+.1f}, {hi:+.1f}]",
+                fontsize=9, color=LCOL[j], va="top", fontweight="600")
+    ax.text(0.4, top * 0.95, "IPL = 0 by construction", fontsize=8.5, color=INK, va="top")
     ax.set_xlabel("league scoring-environment offset $\\delta_\\ell$  (strike-rate points vs IPL)")
-    ax.set_yticks([]); ax.legend(fontsize=8.5, loc="upper left")
+    ax.set_yticks([])
     title(ax, "F8 · What a strike rate is worth in each league",
           "Posterior for $\\delta_\\ell$: how much a league's numbers must be adjusted to read as IPL numbers.")
     save(fig, "F8_offsets", FIGS)
@@ -343,7 +354,8 @@ def f10(threshold=140.0, k=18):
         ax.text(ax.get_xlim()[1], i, f"  {prob[gi]:.2f}", va="center", fontsize=8, color=MUTED)
     ax.set_yticks(ypos); ax.set_yticklabels(names, fontsize=8.5)
     ax.set_xlabel("strike rate on the IPL scale")
-    ax.legend(fontsize=8.5, loc="lower right")
+    ax.legend(fontsize=8.5, loc="lower left", framealpha=.9, facecolor=PAPER,
+              edgecolor="none")
     title(ax, "F10 · The shortlist, with credible intervals",
           f"Top {k} by $P(\\theta_i > {threshold:.0f} \\mid$ data$)$, shown at right. Bars are 95% credible intervals.")
     save(fig, "F10_shortlist", FIGS)

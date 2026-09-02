@@ -27,6 +27,16 @@ def save(fig, name, figs_dir):
     plt.close(fig)
     print(f"  wrote figs/{name}.pdf / .png")
 
+def figtitle(fig, t, sub=None, top=0.86, x=0.008):
+    """Figure-level title and subtitle, left aligned. Used for multi-panel figures so
+    that a long title can never collide with an axes title."""
+    fig.subplots_adjust(top=top)
+    fig.text(x, 0.995, t, fontsize=11.5, fontweight="bold", color=INK,
+             ha="left", va="top")
+    if sub:
+        fig.text(x, 0.945, sub, fontsize=8.8, color=MUTED, ha="left", va="top")
+
+
 def title(ax, t, sub=None):
     y = 1.075 if sub else 1.02
     ax.text(0, y, t, transform=ax.transAxes, fontsize=11.5, fontweight="bold",

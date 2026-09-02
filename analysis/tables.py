@@ -59,8 +59,9 @@ def t2():
          f"Prior mean {p.b_om/(p.a_om-1):.0f}, i.e.\\ $\\omega\\approx{np.sqrt(p.b_om/(p.a_om-1)):.0f}$: "
          "leagues differ by single-digit strike-rate points."),
         ("$\\sigma^2$", f"$\\mathrm{{IG}}({p.a_sig:.0f}, {p.b_sig:,.0f})$",
-         f"Prior mean {p.b_sig/(p.a_sig-1):,.0f}, from the ball-by-ball run distribution: "
-         f"$\\mathrm{{Var}}(X)={var:.2f}$ runs per ball $\\Rightarrow \\sigma^2\\approx{var*1e4:,.0f}$."),
+         f"Prior mean {p.b_sig/(p.a_sig-1):,.0f}, set near the value implied by the ball-by-ball "
+         f"run distribution: $\\mathrm{{Var}}(X)={var:.2f}$ runs per ball, so "
+         f"$\\sigma^2\\approx{var*1e4:,.0f}$ if balls were independent."),
     ]
     s = ["\\begin{tabular}{llp{8.2cm}}", "\\toprule",
          "Parameter & Prior & Where the number comes from \\\\", "\\midrule"]
@@ -91,8 +92,8 @@ def t3():
                      x.reshape(-1).std(ddof=1), *np.percentile(x, [2.5, 97.5]),
                      dg.split_rhat(x), dg.ess(x)))
     th = z["M3_theta"]
-    rh = np.array([dg.split_rhat(th[:, :, i]) for i in range(th.shape[2])])
-    es = np.array([dg.ess(th[:, :, i]) for i in range(0, th.shape[2], 3)])
+    # taken from run_main so that the table and the prose quote the same numbers
+    dsum = json.load(open(os.path.join(OUT, "diag_summary.json")))
     s = ["\\begin{tabular}{lrrrrrr}", "\\toprule",
          "Parameter & Mean & SD & 2.5\\% & 97.5\\% & $\\hat{R}$ & ESS \\\\", "\\midrule"]
     for r in rows:
@@ -100,10 +101,10 @@ def t3():
                  f"& {r[5]:.4f} & {r[6]:,.0f} \\\\")
     s += ["\\midrule",
           f"all {th.shape[2]} $\\theta_i$ (worst) & \\multicolumn{{4}}{{l}}{{}} & "
-          f"{np.nanmax(rh):.4f} & {es.min():,.0f} \\\\",
+          f"{dsum['rhatWorst']:.4f} & {dsum['essMin']:,.0f} \\\\",
           "\\bottomrule", "\\end{tabular}"]
     write("T3_diagnostics", "\n".join(s))
-    return np.nanmax(rh), es.min()
+    return dsum["rhatWorst"], dsum["essMin"]
 
 # ------------------------------------------------------------------- T4 ---
 def t4():
@@ -170,8 +171,21 @@ def t6():
     s += ["\\bottomrule", "\\end{tabular}"]
     write("T6_sensitivity", "\n".join(s))
 
+# ------------------------------------------------------------------- T7 ---
+def t7():
+    prof = json.load(open(os.path.join(ROOT, "data", "league_profile.json")))
+    order = {"ipl": "IPL", "cpl": "CPL", "bbl": "BBL", "t20i": "T20I"}
+    s = ["\\begin{tabular}{lrrrrr}", "\\toprule",
+         "League & Balls & Strike rate & Dot balls & Fours & Balls per six \\\\", "\\midrule"]
+    for x in prof:
+        s.append(f"{order[x['league']]} & {x['balls']:,} & {x['sr']:.1f} & "
+                 f"{x['dot']:.1f}\\% & {x['four']:.1f}\\% & {x['ballsPerSix']:.1f} \\\\")
+    s += ["\\bottomrule", "\\end{tabular}"]
+    write("T7_league_profile", "\n".join(s))
+
+
 if __name__ == "__main__":
-    t1(); m1, var = t2(); rh, es = t3(); t4(); t5(); t6()
+    t1(); m1, var = t2(); rh, es = t3(); t4(); t5(); t6(); t7()
     print(f"\nkey numbers: E[X]={m1:.4f}  Var={var:.4f}  sigma^2={var*1e4:,.0f}  "
           f"sigma={np.sqrt(var)*100:.1f}  SD@100balls={np.sqrt(var)*10:.1f}")
     print(f"worst theta Rhat {rh:.4f}, min theta ESS {es:.0f}")

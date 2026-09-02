@@ -99,7 +99,7 @@ def main():
 
     json.dump(dict(rows=rows, thetaCorr=corr, thetaRMSE=rmse, thetaMaxDiff=mad, passed=bool(ok)),
               open(os.path.join(ROOT, "out", "test4.json"), "w"), indent=1)
-    print("\n" + ("TEST 4 PASSED — the two implementations agree within Monte Carlo error"
+    print("\n" + ("TEST 4 PASSED: the two implementations agree within Monte Carlo error"
                   if ok else "TEST 4 FAILED"))
     sys.exit(0 if ok else 1)
 

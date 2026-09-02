@@ -1,6 +1,6 @@
 """
 WAIC and PSIS-LOO from a pointwise log-likelihood matrix ll of shape
-(draws, cells).  Vehtari, Gelman & Gabry (2017); Session 20.
+(draws, cells).  Vehtari, Gelman and Gabry (2017).
 
 PSIS: the importance ratios for leave-one-out are r_s = 1/p(y_c | theta_s).
 Their right tail is fitted with a generalised Pareto distribution

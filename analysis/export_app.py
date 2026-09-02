@@ -19,12 +19,6 @@ idx = np.linspace(0, th.shape[0] - 1, KEEP).astype(int)
 
 # ---- cells (the app re-runs the sampler on these) -------------------------
 shutil.copy(os.path.join(ROOT, "data", "cells.json"), os.path.join(APP, "cells.json"))
-shutil.copy(os.path.join(ROOT, "data", "holdout.json"), os.path.join(APP, "holdout.json"))
-
-# ---- precomputed posterior draws -----------------------------------------
-json.dump({"nDraws": KEEP,
-           "theta": [[round(float(v), 1) for v in th[idx, i]] for i in range(full.P)]},
-          open(os.path.join(APP, "draws.json"), "w"))
 
 json.dump({"leagues": D["leagues"], "iplIndex": IPL,
            "delta": [[round(float(v), 2) for v in dl[idx, j]] for j in range(4)],
@@ -74,7 +68,6 @@ for name in ("Scout", "Analyst", "CFO", "Stress"):
 json.dump(alt, open(os.path.join(APP, "altpriors.json"), "w"))
 
 # ---- validation, diagnostics, ppc, headline numbers ----------------------
-shutil.copy(os.path.join(OUT, "validation.json"), os.path.join(APP, "validation.json"))
 br = json.load(open(os.path.join(ROOT, "data", "ballruns.json")))
 v = np.array(br["values"], float); c = np.array(br["counts"], float)
 m1 = (v * c).sum() / c.sum(); var = (v**2 * c).sum() / c.sum() - m1**2
@@ -96,6 +89,7 @@ json.dump({
                "deltaLo": [round(float(np.percentile(dl[:, j], 2.5)), 2) for j in range(4)],
                "deltaHi": [round(float(np.percentile(dl[:, j], 97.5)), 2) for j in range(4)]},
     "overlap": overlap,
+    "leagueProfile": json.load(open(os.path.join(ROOT, "data", "league_profile.json"))),
     "counts": {"players": full.P, "cells": full.C, "iplPlayers": ipl.P,
                "balls": int(full.n.sum()),
                "cellsByLeague": [int((full.l == j).sum()) for j in range(4)]},

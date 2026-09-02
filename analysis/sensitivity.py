@@ -1,6 +1,6 @@
 """
-Prior sensitivity as three people who would actually be in the room (PS1 Q1(b)-(c),
-PS4 Q12(e)-(f)).
+Prior sensitivity, expressed as three people who would plausibly disagree about the
+same decision rather than as an arbitrary grid of hyperparameters.
 
   Scout    trusts what he has seen with his own eyes: a wide spread of real ability,
            so a big innings should count.
@@ -38,6 +38,7 @@ if __name__ == "__main__":
         f = run_chains(D["full"], pr, "M3", chains=4, study=f"sens{name}")
         th = f["theta"].reshape(-1, D["full"].P)
         res[name] = dict(theta_mean=th.mean(axis=0),
+                         theta_sd=th.std(axis=0, ddof=1),
                          prob140=(th > 140).mean(axis=0),
                          mu=float(f["mu"].mean()), tau2=float(f["tau2"].mean()),
                          sigma2=float(f["sigma2"].mean()),

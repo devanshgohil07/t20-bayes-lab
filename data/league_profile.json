@@ -1,0 +1,38 @@
+[
+ {
+  "league": "ipl",
+  "balls": 64785,
+  "sr": 138.7,
+  "dot": 36.6,
+  "four": 12.2,
+  "six": 6.4,
+  "ballsPerSix": 15.7
+ },
+ {
+  "league": "cpl",
+  "balls": 29109,
+  "sr": 127.5,
+  "dot": 42.2,
+  "four": 9.8,
+  "six": 6.9,
+  "ballsPerSix": 14.6
+ },
+ {
+  "league": "bbl",
+  "balls": 49387,
+  "sr": 129.5,
+  "dot": 36.0,
+  "four": 10.9,
+  "six": 4.5,
+  "ballsPerSix": 22.2
+ },
+ {
+  "league": "t20i",
+  "balls": 81720,
+  "sr": 129.7,
+  "dot": 38.6,
+  "four": 11.1,
+  "six": 5.4,
+  "ballsPerSix": 18.4
+ }
+]

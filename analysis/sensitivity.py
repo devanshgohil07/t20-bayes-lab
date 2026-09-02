@@ -76,6 +76,7 @@ if __name__ == "__main__":
                            if isinstance(v, np.ndarray)})
     json.dump({n: dict(mu=r["mu"], tau2=r["tau2"], sigma2=r["sigma2"],
                        delta=list(map(float, r["delta"])),
-                       n_shortlist=len(lists[n]), top10=top[n])
+                       n_shortlist=len(lists[n]), top10=top[n],
+                       shortlist=sorted(D["players"][int(i)] for i in lists[n]))
                for n, r in res.items()},
               open(os.path.join(OUT, "sensitivity.json"), "w"), indent=1)

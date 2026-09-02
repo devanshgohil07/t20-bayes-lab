@@ -37,6 +37,8 @@ for j, nm in enumerate(["Ipl", "Cpl", "Bbl", "Ttwoi"]):
 ov = [[len(set(full.p[full.l == a]) & set(full.p[full.l == b])) for b in range(4)] for a in range(4)]
 s("bridgeIplTtwoi", str(ov[0][3])); s("bridgeIplCpl", str(ov[0][1])); s("bridgeIplBbl", str(ov[0][2]))
 
+s("Ndeliveries", f"{int(cnt.sum()):,}")   # every delivery in the window, before the
+                                          # 25-ball floor removes the smallest cells
 s("ballMean", f"{m1:.3f}"); s("ballVar", f"{var:.3f}")
 s("sigmaSqBall", f"{var*1e4:,.0f}"); s("sigmaBall", f"{np.sqrt(var)*100:.1f}")
 s("sdHundred", f"{np.sqrt(var)*10:.1f}")
@@ -94,6 +96,17 @@ s("shortScout", str(sens["Scout"]["n_shortlist"]))
 s("shortCfo", str(sens["CFO"]["n_shortlist"]))
 s("shortStress", str(sens["Stress"]["n_shortlist"]))
 s("topTen", ", ".join(sens["Analyst"]["top10"][:6]))
+# how far the three plausible priors agree, computed rather than remembered
+import itertools as _it
+def _jac(a_, b_):
+    A, B = set(a_), set(b_)
+    return len(A & B) / len(A | B)
+_pairs = [_jac(sens[a_]["shortlist"], sens[b_]["shortlist"])
+          for a_, b_ in _it.combinations(("Scout", "Analyst", "CFO"), 2)]
+s("jaccardLo", f"{min(_pairs):.2f}"); s("jaccardHi", f"{max(_pairs):.2f}")
+s("topTenCommon", str(len(set(sens["Scout"]["top10"]) & set(sens["Analyst"]["top10"])
+                          & set(sens["CFO"]["top10"]))))
+s("stressKeeps", str(len(set(sens["Stress"]["top10"]) & set(sens["Analyst"]["top10"]))))
 
 s("jsMu", f"{[r for r in t4['rows'] if r['param']=='mu'][0]['js']:.2f}")
 s("pyMu", f"{[r for r in t4['rows'] if r['param']=='mu'][0]['python']:.2f}")
@@ -125,11 +138,20 @@ s("moverName", D["players"][gid[worst]].replace("&", "\\&"))
 s("moverBalls", f"{ipl_balls[worst]:.0f}")
 s("moverRaw", f"{raw_ipl[worst]:.0f}")
 s("moverRankRaw", str(rr[worst])); s("moverRankPost", str(rp[worst]))
+s("moverRawExact", f"{raw_ipl[worst]:.1f}")
+s("moverProb", f"{(th[:, gid[worst]] > 140).mean():.2f}")
 riser = top[np.argmin(rp[top] - rr[top])]
 s("riserName", D["players"][gid[riser]])
 s("riserBalls", f"{ipl_balls[riser]:.0f}")
 s("riserRankRaw", str(rr[riser])); s("riserRankPost", str(rp[riser]))
 s("countFall", str(int(np.sum(rp[np.argsort(-raw_ipl)[:22]] > rr[np.argsort(-raw_ipl)[:22]]))))
+# shrinkage weight for the long-career bucket, on total balls across all four leagues
+_tot = np.zeros(full.P); np.add.at(_tot, full.p, full.n)
+_big = np.array([_tot[gid[j]] for j in range(len(gid)) if ipl_balls[j] > 300])
+_w = lambda n: n * tau2.mean() / (s2.mean() + n * tau2.mean())
+s("bigMedianBalls", f"{np.median(_big):,.0f}")
+s("bigMedianW", f"{_w(np.median(_big)):.2f}")
+
 o = np.argsort(-ipl.y)[:15]
 s("topFifteenMedianBalls", f"{np.median(ipl.n[o]):.0f}")
 s("topFifteenNoise", f"{np.sqrt(var*1e4/np.median(ipl.n[o])):.0f}")

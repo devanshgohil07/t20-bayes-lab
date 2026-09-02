@@ -29,14 +29,22 @@ def save(fig, name, figs_dir):
     plt.close(fig)
     print(f"  wrote figs/{name}.pdf / .png")
 
+TITLE_PT, SUB_PT = 11.5, 8.8
+
 def figtitle(fig, t, sub=None, top=0.86, x=0.008):
     """Figure-level title and subtitle, left aligned. Used for multi-panel figures so
-    that a long title can never collide with an axes title."""
+    that a long title can never collide with an axes title.
+
+    The subtitle is offset from the title in points, not as a fraction of the figure.
+    A fixed fraction is too small on a short figure and the two lines collide there,
+    which is what happened to F5 while its height was 2.6 inches."""
     fig.subplots_adjust(top=top)
-    fig.text(x, 0.995, t, fontsize=11.5, fontweight="bold", color=INK,
+    fig.text(x, 0.995, t, fontsize=TITLE_PT, fontweight="bold", color=INK,
              ha="left", va="top")
     if sub:
-        fig.text(x, 0.945, sub, fontsize=8.8, color=MUTED, ha="left", va="top")
+        drop = (TITLE_PT * 1.35) / (fig.get_figheight() * 72.0)
+        fig.text(x, 0.995 - drop, sub, fontsize=SUB_PT, color=MUTED,
+                 ha="left", va="top")
 
 
 def title(ax, t, sub=None):

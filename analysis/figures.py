@@ -76,9 +76,11 @@ def f2():
                                     boxstyle="round,pad=0.012", fc=fc, ec=ec, lw=1.1))
         ax.text(x, y, txt, ha="center", va="center", fontsize=10)
         return (x, y, w, h)
-    def arrow(a, b):
+    def arrow(a, b, rad=0.0):
+        """rad bows the line, which is how the sigma^2 arrow avoids crossing delta."""
         ax.add_patch(FancyArrowPatch((a[0], a[1] - a[3]/2), (b[0], b[1] + b[3]/2),
                                      arrowstyle="-|>", mutation_scale=11,
+                                     connectionstyle=f"arc3,rad={rad}",
                                      color=MUTED, lw=1.0, shrinkA=1, shrinkB=1))
     m0 = node(.13, .88, "$m_0, s_0^2$", "hyper"); at = node(.35, .88, "$a_\\tau, b_\\tau$", "hyper")
     ao = node(.66, .88, "$a_\\omega, b_\\omega$", "hyper"); asg = node(.88, .88, "$a_\\sigma, b_\\sigma$", "hyper")
@@ -87,14 +89,16 @@ def f2():
     th = node(.24, .36, "$\\theta_i$"); de = node(.66, .36, "$\\delta_\\ell$")
     y  = node(.45, .10, "$y_{i\\ell}$", "data")
     for a, b in ((m0, mu), (at, tau), (ao, om), (asg, sg), (mu, th), (tau, th),
-                 (om, de), (th, y), (de, y), (sg, y)):
+                 (om, de), (th, y), (de, y)):
         arrow(a, b)
-    ax.add_patch(Rectangle((.10, .265), .30, .19, fill=False, ec=MUTED, lw=.9, ls=(0,(4,3))))
-    ax.text(.385, .285, "players $i=1..P$", fontsize=8, color=MUTED, ha="right")
-    ax.add_patch(Rectangle((.55, .265), .24, .19, fill=False, ec=MUTED, lw=.9, ls=(0,(4,3))))
-    ax.text(.775, .285, "leagues $\\ell \\neq$ IPL", fontsize=8, color=MUTED, ha="right")
-    ax.add_patch(Rectangle((.28, .03), .34, .155, fill=False, ec=MUTED, lw=.9, ls=(0,(4,3))))
-    ax.text(.605, .048, "cells $i \\times \\ell$", fontsize=8, color=MUTED, ha="right")
+    arrow(sg, y, rad=0.28)          # bowed, so it does not pass through the delta node
+    # Plates. They sit low enough that their captions clear the nodes inside them.
+    ax.add_patch(Rectangle((.155, .235), .265, .22, fill=False, ec=MUTED, lw=.9, ls=(0,(4,3))))
+    ax.text(.408, .247, "players $i=1..P$", fontsize=8, color=MUTED, ha="right", va="bottom")
+    ax.add_patch(Rectangle((.565, .235), .225, .22, fill=False, ec=MUTED, lw=.9, ls=(0,(4,3))))
+    ax.text(.778, .247, "leagues $\\ell \\neq$ IPL", fontsize=8, color=MUTED, ha="right", va="bottom")
+    ax.add_patch(Rectangle((.28, .015), .34, .17, fill=False, ec=MUTED, lw=.9, ls=(0,(4,3))))
+    ax.text(.608, .027, "cells $i \\times \\ell$", fontsize=8, color=MUTED, ha="right", va="bottom")
     ax.text(.02, .10, "what we\nobserve", fontsize=8.5, color=MUTED, ha="left", va="center")
     ax.text(.02, .36, "what we\nwant", fontsize=8.5, color=ACCENT, ha="left", va="center")
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)

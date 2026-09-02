@@ -1,4 +1,7 @@
-"""All six report tables, written as standalone LaTeX fragments into tables/."""
+"""Every table in the report, written as standalone LaTeX fragments into tables/.
+
+T1 to T7, where T1 and T2 each split into two fragments, so nine files in all.
+Numbers quoted in the prose are handled separately by report_numbers.py."""
 import numpy as np, json, os
 import dataio, diagnostics as dg
 from gibbs import Priors, IPL

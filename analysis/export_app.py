@@ -96,7 +96,10 @@ json.dump({
     "diagnostics": json.load(open(os.path.join(OUT, "diag_summary.json"))),
     "ppc": json.load(open(os.path.join(OUT, "ppc.json")))["M3"],
     "compare": json.load(open(os.path.join(OUT, "compare.json"))),
-    "sensitivity": json.load(open(os.path.join(OUT, "sensitivity.json"))),
+    # the full shortlists are only needed for the report's Jaccard numbers, so they
+    # are dropped here rather than shipped to every visitor
+    "sensitivity": {n: {k: v for k, v in r.items() if k != "shortlist"}
+                    for n, r in json.load(open(os.path.join(OUT, "sensitivity.json"))).items()},
 }, open(os.path.join(APP, "meta.json"), "w"), indent=1)
 
 for f in sorted(os.listdir(APP)):

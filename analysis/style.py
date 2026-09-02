@@ -21,9 +21,11 @@ plt.rcParams.update({
 })
 
 def save(fig, name, figs_dir):
+    """Write the figure as PDF and PNG. The PDF creation date is suppressed so that two
+    runs of the pipeline produce byte-identical files, not merely identical pictures."""
     import os
-    for ext in ("pdf", "png"):
-        fig.savefig(os.path.join(figs_dir, f"{name}.{ext}"))
+    for ext, meta in (("pdf", {"CreationDate": None}), ("png", None)):
+        fig.savefig(os.path.join(figs_dir, f"{name}.{ext}"), metadata=meta)
     plt.close(fig)
     print(f"  wrote figs/{name}.pdf / .png")
 

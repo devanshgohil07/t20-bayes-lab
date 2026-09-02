@@ -1,13 +1,17 @@
 """
-Mandatory correctness tests for the Gibbs sampler (spec Part 3).
-These replace a brms/Stan cross-check, which the sandbox cannot run.
+Correctness tests for the Gibbs sampler. They stand in for a cross-check against an
+established package, which is not available here.
 
   1. Single player, single league  -> matches the closed-form Normal-Normal
-                                      conjugate posterior.
-  2. Simulated recovery           -> known theta, delta, sigma2, tau2, omega2
-                                      all inside their 95% credible intervals.
-  3. Limiting cases               -> tau -> 0 gives complete pooling,
-                                      tau -> infinity gives no pooling.
+                                      conjugate posterior, within Monte Carlo error.
+  2. Simulated recovery            -> known theta, delta, sigma2, tau2, omega2
+                                      all inside their credible intervals.
+  3. Limiting cases                -> shrinkage is monotone as tau^2 falls, collapsing
+                                      onto the pooled value; tau^2 -> infinity
+                                      reproduces the raw no-pooling means.
+
+Test 4, which checks the JavaScript sampler in the browser against this one, lives in
+test4_js_vs_python.py because it needs a running server.
 """
 import numpy as np, sys
 from gibbs import Data, Priors, gibbs, run_chains, IPL

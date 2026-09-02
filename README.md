@@ -5,7 +5,9 @@
 A hierarchical Bayesian model of T20 batting ability across four competitions, with an
 interactive companion that runs the sampler in your browser.
 
-Bayesian Statistics · IPM Term VII · Prof. Sayantan Banerjee · IIM Indore
+**Live site:** https://devanshgohil07.github.io/t20-bayes-lab/
+
+Group project · Bayesian Statistics
 
 ---
 
@@ -28,15 +30,15 @@ delta[l]  ~ N(0, omega^2)         the league's scoring environment, delta[IPL] =
 mu ~ N(130, 20^2)   tau^2 ~ IG(3, 450)   omega^2 ~ IG(3, 128)   sigma^2 ~ IG(3, 52000)
 ```
 
-All six full conditionals are closed form, so the sampler is pure Gibbs — no Metropolis step,
-no probabilistic programming language.
+All six full conditionals are closed form, so the sampler is pure Gibbs: no Metropolis step
+and no probabilistic programming language.
 
 ## What we found
 
 | | |
 |---|---|
 | Sampling noise in a 100-ball strike rate, from counting runs | **±16.7** |
-| Fitted σ² vs the independence value | **1.93×** — balls are not conditionally independent |
+| Fitted σ² vs the independence value | **1.93×**, so balls are not conditionally independent |
 | The model's own read of a 100-ball strike rate | **±23.2** |
 | League offsets vs the IPL | CPL −7.9, BBL −5.0, T20I −5.2 (all intervals exclude zero) |
 | 2025 holdout, batters with an IPL record | M3 **25.0** < M2 25.5 < M0 26.7 < raw leaderboard 29.9 |
@@ -86,8 +88,8 @@ cd app && python3 -m http.server 8899
 # then open http://127.0.0.1:8899
 ```
 
-Opening `index.html` directly from the filesystem will not work — the page fetches its JSON,
-and browsers block that over `file://`.
+Opening `index.html` directly from the filesystem will not work, because the page fetches its
+JSON and browsers block that over `file://`.
 
 Test 4, which checks the JavaScript sampler against the Python one, needs the server running:
 

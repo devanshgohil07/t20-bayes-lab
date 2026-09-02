@@ -4,9 +4,14 @@ Beyond Strike Rate: data preparation.
 Reads the four Cricsheet CSV (csv2) archives, restricts to 2021-2025, aggregates
 ball-by-ball deliveries to player x league cells, and writes:
 
-    data/cells.json    training cells   (2021-2024, all four leagues)
-    data/holdout.json  test cells       (2025, IPL only)
-    data/ballruns.json empirical distribution of runs off the bat (for sigma^2)
+    data/cells.json          training cells   (2021-2024, all four leagues)
+    data/holdout.json        test cells       (2025, IPL only)
+    data/ballruns.json       empirical distribution of runs off the bat (for sigma^2).
+                             Counted over every delivery in the window, before the
+                             25-ball floor drops the smallest cells.
+    data/league_profile.json per-league ball outcome profile: strike rate, dot, four
+                             and six shares, balls per six. Used to show that the
+                             league offsets measure scoring environment, not standard.
 
 Also prints the league x league bridge-player overlap matrix, which is the
 identification check for the league-offset parameters delta[l].

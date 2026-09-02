@@ -8,8 +8,6 @@
 | **Use the interactive site** | https://devanshgohil07.github.io/t20-bayes-lab/ |
 | **Everything else** | is in this repository. The map is at the bottom. |
 
-Group project · Bayesian Statistics
-
 ---
 
 ## The problem

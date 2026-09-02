@@ -2,8 +2,11 @@
 
 **Estimating T20 batting ability across four competitions with a hierarchical Bayesian model.**
 
-**Live site:** https://devanshgohil07.github.io/t20-bayes-lab/  
-**Report:** [`report/report.pdf`](report/report.pdf)
+| | |
+|---|---|
+| **Read the report** | [`report/report.pdf`](report/report.pdf), 18 pages |
+| **Use the interactive site** | https://devanshgohil07.github.io/t20-bayes-lab/ |
+| **Everything else** | is in this repository. The map is at the bottom. |
 
 Group project · Bayesian Statistics
 
@@ -17,16 +20,17 @@ an average, and an average over a small number of balls moves around on its own.
 Before any model, count. A ball off the bat produces 0, 1, 2, 4 or 6 runs, and almost nothing
 else. Across the 225,001 deliveries in our window the mean is 1.320 runs per ball with variance
 2.798. A strike rate multiplies by 100, so the per-ball variance on the strike-rate scale is
-about 27,978, and the standard deviation of a strike rate over *n* balls is σ/√n.
-
-Put *n* = 100:
+about 27,978, and the standard deviation of a strike rate over *n* balls is σ/√n. Put *n* = 100:
 
 > **A strike rate over 100 balls carries ±16.7 points of sampling noise.**
 > This number needs no model. It follows from counting runs.
 
 So the raw leaderboard is not a neutral summary of the data. It is an estimate, and a noisy one
-for anyone with a short record. This project replaces it with a model that says how much of a
-batter's number to believe, and that can put a CPL or BBL strike rate on the IPL scale.
+for anyone with a short record. It also has nothing at all to say about a batter who has never
+played in the IPL, which is exactly the batter a franchise is most often bidding on.
+
+We replace it with a model that says how much of a batter's number to believe, puts a CPL or
+BBL strike rate on the IPL scale, and returns each batter as a probability rather than a rank.
 
 ## The model
 
@@ -41,35 +45,84 @@ delta[l]  ~ N(0, omega^2),  delta[IPL] = 0
 mu ~ N(130, 20^2)   tau^2 ~ IG(3, 450)   omega^2 ~ IG(3, 128)   sigma^2 ~ IG(3, 52000)
 ```
 
-Each piece, in one line:
-
-- `theta[i]` is what we want: the batter's ability, expressed as the strike rate we expect from
-  him in the IPL.
+- `theta[i]` is what we want: the batter's ability, as the strike rate we expect from him in
+  the IPL.
 - `delta[l]` is the competition's scoring environment. Fixing `delta[IPL] = 0` is what makes
   every `theta` readable as an IPL number.
 - The likelihood variance is `sigma^2 / n[c]`, because `y[c]` is a mean over `n[c]` balls. A
-  batter with 600 balls therefore pulls harder than one with 30, which is the whole point.
-- The offsets are identified by batters who appear in more than one competition. 106 link the
+  batter with 600 balls pulls harder than one with 30, which is the whole point.
+- The offsets are identified by batters who appear in more than one competition: 106 link the
   IPL to T20 internationals, 38 to the CPL, 36 to the BBL.
 - All six full conditionals are closed form, so the sampler is plain Gibbs. No Metropolis step,
   no probabilistic programming language.
 
-The prior for `sigma^2` is centred on the 27,978 counted above. The others are weakly
-informative and the report shows that the ranking does not depend on them.
-
-## The decision
-
-Inference and the decision are kept apart. The model returns a posterior for each batter. The
-franchise says what it is buying and how sure it needs to be:
+The decision is kept separate from the inference. The model returns a posterior; the franchise
+says what it is buying and how sure it needs to be:
 
 ```
 shortlist batter i   if   P(theta[i] > c | data) > p
 ```
 
-Our baseline is `c = 140`, `p = 0.80`, which shortlists 28 batters. Both numbers are business
-choices, not statistical ones, and the site lets you move them.
+Our baseline is `c = 140`, `p = 0.80`, which shortlists 28 batters. Both are business choices,
+not statistical ones, and the site lets you move them.
 
-## What the model gives
+## How we built it
+
+Six steps, in order.
+
+**1. Build the data.** Cricsheet publishes every delivery of the IPL, CPL, BBL and men's T20
+internationals. `prep/build_data.py` reads all four archives, drops wides (a wide is not a ball
+the batter faced), keeps no-balls, and aggregates deliveries into player × league cells. Cells
+under 25 balls are dropped, which is what lets us treat a cell strike rate as an approximately
+Normal average.
+
+**2. Check the model is identifiable before fitting it.** The league offsets are only knowable
+from batters who played in more than one competition. Step 1 prints the league-by-league overlap
+matrix, and that is the go or no-go check: with no bridge players, nothing identifies the
+offsets and the model is not worth fitting. This is also where we found that the unfiltered T20I
+file spans 105 national teams and had to be restricted (see the notes below).
+
+**3. Test the sampler before trusting it.** `analysis/tests_correctness.py` runs three checks:
+one batter in one league must reproduce the closed-form conjugate posterior; data simulated from
+known parameters must be recovered inside their intervals; and shrinkage must behave correctly
+in the limits. `analysis/test4_js_vs_python.py` adds a fourth, running the browser sampler
+headlessly and comparing it with the Python one. Only then did we fit anything real.
+
+**4. Fit the ladder.** `analysis/run_main.py` fits four models: complete pooling (M0), no
+pooling (M1, which is the raw leaderboard written as a model), partial pooling on IPL data alone
+(M2), and partial pooling with league offsets (M3). Comparing against the simpler rungs is what
+shows the hierarchy earns its extra parameters.
+
+**5. Check the fit.** Convergence with split R-hat and effective sample size
+(`analysis/diagnostics.py`), posterior predictive checks (`analysis/ppc.py`), and WAIC with
+PSIS-LOO (`analysis/compare.py`). The posterior predictive check is the one that found a real
+misfit, which the report reports rather than hides.
+
+**6. Validate out of sample and stress the priors.** `analysis/validation.py` predicts every
+batter's 2025 IPL strike rate from 2021 to 2024 data, stratified by how much IPL history each
+batter had beforehand. The table structure was fixed before it was run.
+`analysis/sensitivity.py` then refits under the priors of a scout, an analyst and a finance
+head, plus one deliberately implausible prior to find where the conclusion breaks.
+
+Every figure, table and quoted number is then generated from the fitted draws, so nothing in the
+report is typed by hand.
+
+To re-run it yourself, after downloading the Cricsheet CSV archives into `raw/`:
+
+```bash
+python3 prep/build_data.py                     # cells, holdout, ball runs, league profile
+cd analysis
+python3 tests_correctness.py                   # checks 1 to 3
+for s in run_main validation compare ppc sensitivity; do python3 $s.py; done
+for s in figures tables report_numbers export_app; do python3 $s.py; done
+cd ../report && pdflatex report.tex && pdflatex report.tex
+```
+
+Python 3.11 with numpy, pandas, scipy and matplotlib. No R, no Stan, no `brms`. Seeding is a
+pure function of `MASTER_SEED` in `analysis/rng.py`, so two runs give byte-identical output,
+figures included. The fit takes about twenty seconds.
+
+## What we found
 
 | | |
 |---|---|
@@ -81,108 +134,82 @@ choices, not statistical ones, and the site lets you move them.
 | 2025 holdout, no IPL record but an overseas one | M3 **33.7**; the raw leaderboard gives no estimate at all |
 | Coverage of the 95% interval | 94–95% with pooling, **79%** without |
 
-The second row is the one worth pausing on. The last row is the one a franchise should care
-about: intervals that cover what they claim to cover are what make a probability threshold
-mean anything.
+The last row is the one a franchise should care about. Intervals that cover what they claim to
+cover are what make a probability threshold mean anything.
 
-## Reproducing the analysis
+## Where everything is
 
-Python 3.11 with numpy, pandas, scipy and matplotlib. No R, no Stan, no `brms`.
+**The report** is `report/report.pdf`, built from `report/report.tex` and `preamble.tex`.
 
-```bash
-# 1. Data. Download the CSV (csv2) archives from https://cricsheet.org/matches/
-#    and unzip into raw/ipl, raw/cpl, raw/bbl, raw/t20i
-python3 prep/build_data.py     # writes data/cells.json, holdout.json, ballruns.json,
-                               # league_profile.json, and prints the bridge-player matrix
+**The site** is at https://devanshgohil07.github.io/t20-bayes-lab/ and its source is in `app/`:
+`index.html`, `css/style.css`, five files in `js/`, and the exported posteriors in `data/`
+(516 KB). The sampler in `app/js/gibbs.js` is a second, independent implementation of the same
+six conditionals, written in JavaScript; check 4 is what confirms the two agree.
 
-# 2. Check the sampler before trusting it
-cd analysis
-python3 tests_correctness.py   # tests 1 to 3
-
-# 3. Fit and analyse
-python3 run_main.py            # M0 to M3, draws and diagnostics
-python3 validation.py          # the 2025 IPL holdout study
-python3 compare.py             # WAIC and PSIS-LOO
-python3 ppc.py                 # posterior predictive checks
-python3 sensitivity.py         # scout, analyst, finance and stress priors
-
-# 4. Outputs
-python3 figures.py             # F1 to F10, as PDF and PNG
-python3 tables.py              # T1 to T7, as LaTeX fragments
-python3 report_numbers.py      # every number quoted in the report, as a LaTeX macro
-python3 export_app.py          # the JSON the site reads
-
-# 5. The report
-cd ../report && pdflatex report.tex && pdflatex report.tex
-```
-
-The bridge-player matrix printed by step 1 is the go or no-go check. If batters did not appear
-in more than one competition, nothing would identify the offsets and the model would not be
-worth fitting.
-
-Every run is seeded from `MASTER_SEED = 20260901` in `analysis/rng.py`. Chain seeds come from
-`zlib.crc32` and not Python's built-in `hash()`, which is salted per process, so two runs of the
-same script give byte-identical output, figures included.
-
-`raw/` and the posterior draws in `out/*.npz` are not in the repository. Steps 1 and 3 rebuild
-them, and the fit takes about twenty seconds.
-
-## Running the site locally
-
-No build step, no dependencies, no bundler.
-
-```bash
-cd app && python3 -m http.server 8899
-# then open http://127.0.0.1:8899
-```
-
-Opening `index.html` from the filesystem will not work, because the page fetches its JSON and
-browsers block that over `file://`.
-
-Test 4 checks the JavaScript sampler against the Python one and needs the server running:
-
-```bash
-python3 analysis/test4_js_vs_python.py
-```
-
-## Deploying the site
-
-The site is static. Upload the contents of `app/` to a repository, then
-**Settings, Pages, Deploy from a branch, `main` / `(root)`**.
-
-## The code
-
-Every number, table and figure in the report is produced by the code here; nothing is typed by
-hand. The report does not reprint any of it, so this is the place to read it.
-
-Two files are worth opening first. `analysis/gibbs.py` is the six full conditionals of
-Appendix A written out in under two hundred lines. `app/js/gibbs.js` is the same sampler written
-a second time, in another language, from the same derivations. Test 4 checks that the two agree,
-which is the closest thing we have to an independent implementation.
+**The code** that produces every result:
 
 ```
-prep/build_data.py     Cricsheet -> cells.json / holdout.json / ballruns.json / league_profile.json
+prep/build_data.py       Cricsheet archives -> cells, holdout, ball runs, league profile
 analysis/
-  gibbs.py             the six full conditionals and the M0 to M3 ladder
-  rng.py               seeding
-  dataio.py            loaders; the `full` view and the re-indexed `ipl` view
-  diagnostics.py       split R-hat, Geyer ESS, autocorrelation
-  waic_loo.py          WAIC and PSIS-LOO with generalised Pareto tail fitting
-  tests_correctness.py       tests 1 to 3
-  test4_js_vs_python.py      test 4, drives the browser sampler headlessly
-  run_main.py  validation.py  compare.py  ppc.py  sensitivity.py
-  figures.py  style.py  tables.py  report_numbers.py  export_app.py
-app/
-  index.html  css/style.css
-  js/rng.js  js/gibbs.js  js/worker.js  js/plots.js  js/app.js
-  data/*.json                 exported posteriors, 516 KB
-report/report.tex      the report; preamble.tex the style, report.pdf the built version
-figs/ (22)             F1 to F10, as PDF and PNG
-tables/ (10)           T1 to T7, plus numbers.tex
-data/ (4)              cells, holdout, the per-ball run distribution, the league profile
+  gibbs.py               the six full conditionals and the M0 to M3 ladder
+  rng.py                 seeding
+  dataio.py              loaders; the full view and the re-indexed IPL view
+  diagnostics.py         split R-hat, Geyer ESS, autocorrelation
+  waic_loo.py            WAIC and PSIS-LOO with generalised Pareto tail fitting
+  tests_correctness.py   checks 1 to 3
+  test4_js_vs_python.py  check 4, drives the browser sampler headlessly
+  run_main.py            fits the ladder, saves draws and diagnostics
+  validation.py          the 2025 IPL holdout study
+  compare.py             WAIC and LOO on the common 194 IPL cells
+  ppc.py                 posterior predictive checks
+  sensitivity.py         scout, analyst, finance and stress priors
+  figures.py, style.py   every figure
+  tables.py              every table
+  report_numbers.py      every number quoted in the report, as a LaTeX macro
+  export_app.py          the JSON the site reads
 ```
 
-## Three points about the data and the fit
+`analysis/gibbs.py` is the best place to start: it is the six conditionals of Appendix A written
+out in under two hundred lines.
+
+**The figures** are in `figs/`, each as both PDF and PNG:
+
+| | |
+|---|---|
+| F1 | Strike rate against balls faced |
+| F2 | The model as a directed acyclic graph |
+| F3 | Prior predictive check |
+| F4 | Trace plots for the four global parameters |
+| F5 | Autocorrelation of the thinned draws |
+| F6 | Posterior predictive check |
+| F7 | The leaderboard after partial pooling |
+| F8 | What a strike rate is worth in each league |
+| F9 | Predictive accuracy by prior IPL exposure |
+| F10 | The shortlist, with credible intervals |
+
+`figs/F10_shortlist_ALLT20I_before.pdf` is kept on purpose: the shortlist from before the T20I
+restriction, discussed below.
+
+**The tables** are in `tables/`, as LaTeX fragments:
+
+| | |
+|---|---|
+| T1a, T1b | The four competitions after filtering; the bridge-player overlap matrix |
+| T2, T2b | The priors and where each number comes from; the distribution of runs off the bat |
+| T3 | Posterior summaries and convergence diagnostics |
+| T4 | WAIC and PSIS-LOO for the four models |
+| T5 | Out-of-sample accuracy on the 2025 IPL |
+| T6 | Prior sensitivity |
+| T7 | How each competition scores |
+
+`tables/numbers.tex` holds every other number the report quotes, as a macro.
+
+**The data** is in `data/`: `cells.json` (the 839 training cells), `holdout.json` (the 2025
+IPL), `ballruns.json` (the per-ball run distribution) and `league_profile.json` (each
+competition's dot, four and six rates). The raw Cricsheet archives and the posterior draws are
+not in the repository; both are rebuilt by the commands above.
+
+## Three notes about the data and the fit
 
 **T20 internationals are restricted to Full Member against Full Member matches.** The
 unfiltered archive covers 105 national teams, from India and Australia down to Estonia and
@@ -202,7 +229,7 @@ bridge-player logic on a different quantity, rate the CPL among the strongest co
 world T20; our offset puts it lowest of the four. Both can be true. The CPL clears the rope more
 often than the IPL, once every 14.6 balls against 15.7, but plays 42.2% dot balls against the
 IPL's 36.6%, so the same batter scores more slowly there. `data/league_profile.json` holds the
-per-league ball profile behind that claim.
+per-league profile behind that claim.
 
 ## Data
 

@@ -491,7 +491,7 @@ respectively link those competitions to the IPL directly.
 It is tempting to read $\delta_\ell$ as a league table. It is not one, and the CPL shows why.
 CricViz, using the same bridge-player logic on a different quantity, rate the CPL as one of the
 strongest competitions in world T20 and place T20 internationals below several domestic leagues
-(Wisden, 2020). Our offset puts the CPL lowest of the four. Both can be true, because they
+(Wilde, 2020). Our offset puts the CPL lowest of the four. Both can be true, because they
 measure different things: CricViz measure \emph{standard}, and we measure \emph{scoring
 environment}.
 
@@ -522,7 +522,7 @@ harder.
 \subsection{Predictive accuracy using WAIC and LOO}
 
 \begin{table}[H]
-\centering\small
+\centering\small\setlength{\tabcolsep}{3pt}
 \input{../tables/T4_waic_loo}
 \caption{WAIC and PSIS-LOO for the four models, all evaluated on the same 194 IPL
 cells so that the numbers are comparable. $\hat{k}$ is the Pareto shape from PSIS; values above
@@ -720,28 +720,79 @@ browser at \url{https://devanshgohil07.github.io/t20-bayes-lab/}, so a reader ca
 priors, move the decision threshold and see the effect on the shortlist directly.
 
 
+\section*{Code and data}
+\addcontentsline{toc}{section}{Code and data}
+
+Every number, table and figure in this report is produced by the code in the project
+repository; nothing is typed by hand. The repository is public at
+\url{https://github.com/devanshgohil07/t20-bayes-lab} and its README documents how to
+reproduce the whole pipeline from the raw archives in five commands.
+
+\begin{center}\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{10.4cm}}
+\toprule
+Folder & What is in it \\
+\midrule
+\texttt{prep/} & \texttt{build\_data.py}: Cricsheet archives to model-ready cells. Assembles the
+  T20I aggregate file, drops wides, applies the Full Member filter and the 25-ball floor, and
+  prints the bridge matrix. \\
+\texttt{analysis/} & The sampler (\texttt{gibbs.py}), seeding, diagnostics, WAIC and PSIS-LOO,
+  the four correctness tests, the holdout study, prior sensitivity, and the scripts that write
+  every figure, table and quoted number. \\
+\texttt{app/} & The interactive site: the same sampler written independently in JavaScript, with
+  no libraries and no build step. \\
+\texttt{data/} & The model inputs: cells, holdout, the per-ball run distribution and the
+  per-league ball profile. \\
+\texttt{figs/}, \texttt{tables/} & Figures F1--F10 and tables T1--T7, as generated. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The two files worth reading first are \texttt{analysis/gibbs.py}, which is the six full
+conditionals derived in Appendix~A written out in about a hundred lines, and
+\texttt{app/js/gibbs.js}, which is the same sampler written a second time from the same
+derivations. Test 4 checks that the two agree.
+
 \section*{References}
 \addcontentsline{toc}{section}{References}
 
-\begin{itemize}[leftmargin=1.4em,itemsep=3pt]
-\item ESPNcricinfo (2024). IPL 2025 auction retention rules.
-  \url{https://www.espncricinfo.com/story/-1452396}.
+\begin{itemize}[leftmargin=1.4em,itemsep=4pt]
+\item ESPNcricinfo (2024). IPL 2025 auction retention rules: six retentions per team, right to
+  match returns, Impact Player to stay.\\
+  \url{https://www.espncricinfo.com/story/ipl-2025-auction-retention-rules-six-retentions-per-team-right-to-match-returns-impact-player-to-stay-1452396}
 \item Gelman, A., Carlin, J.\ B., Stern, H.\ S., Dunson, D.\ B., Vehtari, A.\ and Rubin, D.\ B.
-  (2013). \emph{Bayesian Data Analysis}, 3rd edn. Chapman and Hall/CRC.
+  (2013). \emph{Bayesian Data Analysis}, 3rd edn. Chapman and Hall/CRC. Chapter 5 for the
+  hierarchical Normal model, section 11.4 for split $\hat R$.\\
+  \url{http://www.stat.columbia.edu/~gelman/book/}
+\item Geyer, C.\ J.\ (1992). Practical Markov chain Monte Carlo. \emph{Statistical Science} 7,
+  473--483. The initial-positive-sequence estimator used for effective sample size.\\
+  \url{https://doi.org/10.1214/ss/1177011137}
 \item Jensen, S.\ T., McShane, B.\ B.\ and Wyner, A.\ J.\ (2009). Hierarchical Bayesian
-  modeling of hitting performance in baseball. \emph{Bayesian Analysis} 4, 631--652.
+  modeling of hitting performance in baseball. \emph{Bayesian Analysis} 4, 631--652.\\
+  \url{https://doi.org/10.1214/09-BA424}
 \item Johnson, A.\ A., Ott, M.\ Q.\ and Dogucu, M.\ (2022). \emph{Bayes Rules! An Introduction
-  to Applied Bayesian Modeling}. Chapman and Hall/CRC.
-\item Rushe, S.\ \emph{Cricsheet}: ball-by-ball data for men's T20 cricket.
-  \url{https://cricsheet.org}.
+  to Applied Bayesian Modeling}. Chapman and Hall/CRC. Free online edition.\\
+  \url{https://www.bayesrulesbook.com}
+\item Rushe, S.\ \emph{Cricsheet}: ball-by-ball data for men's T20 cricket. The source of every
+  delivery used here.\\
+  \url{https://cricsheet.org/matches/}
 \item Stevenson, O.\ G.\ and Brewer, B.\ J.\ (2017). Bayesian survival analysis of batsmen in
-  Test cricket. \emph{Journal of Quantitative Analysis in Sports} 13, 25--36.
+  Test cricket. \emph{Journal of Quantitative Analysis in Sports} 13, 25--36.\\
+  \url{https://doi.org/10.1515/jqas-2016-0090}
 \item Vehtari, A., Gelman, A.\ and Gabry, J.\ (2017). Practical Bayesian model evaluation using
-  leave-one-out cross-validation and WAIC. \emph{Statistics and Computing} 27, 1413--1432.
-\item Wisden (2020). CricViz: an analytical guide to the major global T20 leagues; and CricViz:
-  why the IPL is higher quality than T20Is. \url{https://www.wisden.com}.
+  leave-one-out cross-validation and WAIC. \emph{Statistics and Computing} 27, 1413--1432.\\
+  \url{https://doi.org/10.1007/s11222-016-9696-4}
+\item Wilde, F.\ (2020). CricViz: an analytical guide to the major global T20 leagues.
+  \emph{Wisden}, 25 April.\\
+  \url{https://www.wisden.com/cricket-news/cricviz-an-analytical-guide-to-the-major-global-t20-leagues}
+\item Wilde, F.\ (2020). CricViz: why the IPL is higher quality than T20Is, and the T20 Blast
+  is not. \emph{Wisden}, 5 May. The source of the league-standard ordering discussed in
+  Section~\ref{sec:results}.\\
+  \url{https://www.wisden.com/series/hbl-pakistan-super-league-2019-20/cricket-news/cricviz-why-the-ipl-is-higher-quality-than-t20is-and-the-t20-blast-isnt}
 \item Zhang, J.\ and Stephens, M.\ A.\ (2009). A new and efficient estimation method for the
-  generalized Pareto distribution. \emph{Technometrics} 51, 316--325.
+  generalized Pareto distribution. \emph{Technometrics} 51, 316--325. The tail fit inside
+  PSIS-LOO.\\
+  \url{https://doi.org/10.1198/tech.2009.08017}
 \end{itemize}
 
 \newpage
@@ -757,8 +808,8 @@ p(\theta,\delta,\mu,\tau^2,\omega^2,\sigma^2 \mid y) \propto\
 \ \prod_{\ell \neq \mathrm{IPL}} (\omega^2)^{-1/2}
   \exp\!\left\{-\frac{\delta_\ell^2}{2\omega^2}\right\} \\
 \times\ & \exp\!\left\{-\frac{(\mu-m_0)^2}{2 s_0^2}\right\}
-  (\tau^2)^{-(a_\tau+1)}e^{-b_\tau/\tau^2}
-  (\omega^2)^{-(a_\omega+1)}e^{-b_\omega/\omega^2}
+  (\tau^2)^{-(a_\tau+1)}e^{-b_\tau/\tau^2} \\
+\times\ & (\omega^2)^{-(a_\omega+1)}e^{-b_\omega/\omega^2}
   (\sigma^2)^{-(a_\sigma+1)}e^{-b_\sigma/\sigma^2}.
 \end{align*}
 
@@ -787,55 +838,5 @@ $b + \frac{1}{2}\mathrm{SS}$: $k=P$ and $\mathrm{SS}=\sum(\theta_i-\mu)^2$ for $
 $k=L-1$ and $\mathrm{SS}=\sum \delta_\ell^2$ for $\omega^2$; $k=C$ and
 $\mathrm{SS}=\sum n_c(y_c-\theta_{p(c)}-\delta_{\ell(c)})^2$ for $\sigma^2$. The weight $n_c$
 appears because the likelihood variance is $\sigma^2/n_c$, not $\sigma^2$.
-
-\newpage
-\section{The code}
-
-Every number in this report is produced by the scripts below; nothing is typed by hand. The
-full repository, including the interactive site, is laid out as follows.
-
-\begin{center}\small
-\begin{tabular}{p{5.0cm}p{9.6cm}}
-\toprule
-Path & What it does \\
-\midrule
-\texttt{prep/build\_data.py} & Cricsheet archives $\rightarrow$ \texttt{cells.json},
-  \texttt{holdout.json}, \texttt{ballruns.json}. Assembles the T20I aggregate file, drops
-  wides, applies the Full Member filter and the 25-ball floor, and prints the bridge matrix. \\
-\texttt{analysis/gibbs.py} & The six full conditionals and the M0--M3 ladder. \\
-\texttt{analysis/rng.py} & Seed derivation; master seed 20260901. \\
-\texttt{analysis/dataio.py} & Loads the cells; \texttt{full} and re-indexed \texttt{ipl} views. \\
-\texttt{analysis/diagnostics.py} & Split $\hat R$, Geyer ESS, autocorrelation. \\
-\texttt{analysis/waic\_loo.py} & WAIC and PSIS-LOO with generalised Pareto tail fitting. \\
-\texttt{analysis/tests\_correctness.py} & Correctness tests 1--3. \\
-\texttt{analysis/test4\_js\_vs\_python.py} & Test 4: drives the browser sampler headlessly. \\
-\texttt{analysis/run\_main.py} & Fits M0--M3, writes draws and the diagnostics table. \\
-\texttt{analysis/validation.py} & The 2025 holdout study, five buckets, bootstrap errors. \\
-\texttt{analysis/compare.py} & WAIC / LOO on the common 194 IPL cells. \\
-\texttt{analysis/ppc.py} & Posterior predictive checks. \\
-\texttt{analysis/sensitivity.py} & Scout / Analyst / CFO / stress priors. \\
-\texttt{analysis/figures.py}, \texttt{style.py} & Figures F1--F10. \\
-\texttt{analysis/tables.py} & Tables T1--T6 as \LaTeX\ fragments. \\
-\texttt{analysis/report\_numbers.py} & Every quoted number, as a \LaTeX\ macro. \\
-\texttt{analysis/export\_app.py} & Writes the JSON the site reads. \\
-\texttt{app/} & The interactive site: no libraries, no build step. \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\subsection*{B.1\quad \texttt{prep/build\_data.py}}
-\lstinputlisting[language=Python]{../prep/build_data.py}
-
-\subsection*{B.2\quad \texttt{analysis/gibbs.py}: the sampler}
-\lstinputlisting[language=Python]{../analysis/gibbs.py}
-
-\subsection*{B.3\quad \texttt{analysis/diagnostics.py}}
-\lstinputlisting[language=Python]{../analysis/diagnostics.py}
-
-\subsection*{B.4\quad \texttt{app/js/gibbs.js}: the same sampler, independently written}
-\lstinputlisting[language=Java]{../app/js/gibbs.js}
-
-\subsection*{B.5\quad \texttt{app/js/rng.js}: Box--Muller and Marsaglia--Tsang in the browser}
-\lstinputlisting[language=Java]{../app/js/rng.js}
 
 \end{document}

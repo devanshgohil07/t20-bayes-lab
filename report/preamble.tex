@@ -7,14 +7,15 @@
 \usepackage[margin=2.45cm,top=2.3cm,bottom=2.4cm]{geometry}
 \usepackage{microtype}
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage[font=small,labelfont=bf,labelsep=period,skip=4pt]{caption}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{xcolor}
-\usepackage{listings}
 \usepackage[hidelinks,colorlinks=true,linkcolor=accent,citecolor=accent,urlcolor=accent]{hyperref}
+\usepackage{xurl}   % allow long URLs to break at any character
 
 \definecolor{accent}{HTML}{B3122B}
 \definecolor{ink}{HTML}{14181F}
@@ -47,18 +48,4 @@
    \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}\small}
   {\end{minipage}\end{lrbox}\colorbox{panel}{\usebox{\calloutbox}}\endgroup\par\vspace{7pt}}
 
-\lstdefinestyle{code}{
-  basicstyle=\ttfamily\scriptsize,
-  keywordstyle=\color{accent},
-  commentstyle=\color{muted}\itshape,
-  stringstyle=\color{ink},
-  numbers=left, numberstyle=\tiny\color{muted}, numbersep=7pt,
-  breaklines=true, breakatwhitespace=false, columns=fullflexible,
-  showstringspaces=false, frame=single, rulecolor=\color{rule},
-  backgroundcolor=\color{panel}, xleftmargin=16pt, framexleftmargin=16pt,
-  aboveskip=8pt, belowskip=8pt, tabsize=2
-}
-\lstset{style=code}
-\lstset{extendedchars=true, inputencoding=utf8,
-  literate={§}{{\S}}1 {·}{{$\cdot$}}1 {—}{{---}}1 {'}{{'}}1 {"}{{"}}1}
-\lstdefinestyle{codewide}{style=code, basicstyle=\ttfamily\tiny}
+% (the code listing appendix was dropped; the code lives in the repository)
